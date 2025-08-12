@@ -1,0 +1,60 @@
+@charset "UTF-8";
+
+	.border { border : 1px solid red; }
+	.center { margin : 0 auto; }
+	* { box-sizing: border-box; }
+	
+	#sns-alarm-box {
+		position: absolute;
+	    overflow-y: auto;
+    	overflow-x: hidden;
+	    border: 2px solid #C0C0C0;
+	    background: white;
+	    width: 421px;
+	    height: 567px;
+	    left: 65%;
+	    top: 13%;
+	    z-index: 1;
+	    display: none;
+	}
+	#sns-alarm-header {
+		width : 421px;
+		height: 60px;
+	}
+	#sns-alarm-header::after {
+		content: "";
+	    width: 2px;
+	    height: 415px;
+	    background-color: rgb(245, 245, 245);
+	    position: absolute;
+	    top: -137px;
+	    left: 50%;
+	    z-index: -1;
+	    transform: rotate(90deg);
+	}
+	.alarm-content {
+		width : 421px;
+	}
+	.alarm-content > div:nth-child(1) {
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+	
+	.alarm-content-time {
+		width : 421px;
+		padding-left: 20px;
+	}
+	#sns-alarm-header > h3 {
+		position: sticky;
+		line-height: 15px;
+    	margin-left: 10px;
+	}
+	.alarm-content-time {
+		padding-top: 10px;
+		font-size: 15px;
+		font-weight: 450;
+		color: grey;
+	}
+	.alarm-content-list {	/* 알림 사이사이 간격 */
+		padding-bottom: 25px;
+	}

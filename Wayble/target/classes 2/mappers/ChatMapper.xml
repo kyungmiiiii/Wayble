@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ChatMapper">
+	<!-- 내가 참여한 오픈채팅방  -->
+	<select id="getMyOpenChatList" resultType="com.wayble.dto.ChatDetailDto">
+		<![CDATA[
+			SELECT		c.chat_room_idx chatRoomIdx, captain_user_idx captainUserIdx, name, category, description, limit, (SELECT COUNT(*) FROM chat_member m WHERE c.chat_room_idx = m.chat_room_idx) currJoin
+			FROM    	chat c
+			INNER JOIN 	chat_member m ON m.chat_room_idx = c.chat_room_idx
+			WHERE   	m.user_idx = #{userIdx} AND c.limit <> 2
+		]]>
+	</select>
+	
+	<!-- 마지막으로 보낸 메시지 -->
+	<select id="getLastMessage" resultType="com.wayble.dto.MessageDto">
+		<![CDATA[
+			SELECT	content, message_idx messageIdx
+			FROM	message
+			WHERE 	chat_room_idx = #{chatRoomIdx} AND message_idx = (SELECT MAX(message_idx) FROM message WHERE chat_room_idx = #{chatRoomIdx} AND user_idx <> 0)
+		]]>
+	</select>
+	
+	<!-- 내가 참여한 1:1 채팅방 목록 -->
+	<select id="getMyChatList" resultType="com.wayble.dto.PrivateChatUserDto">
+		<![CDATA[
+			SELECT  	u.user_idx userIdx, u.nickname, u.profile, l.chat_room_idx chatRoomIdx
+			FROM    	(SELECT  	c.chat_room_idx
+						 FROM    	chat c
+						 INNER JOIN  chat_member m ON m.chat_room_idx = c.chat_room_idx
+						 WHERE   	c.limit = 2 AND m.user_idx = #{userIdx}) l
+			INNER JOIN 	chat_member c ON c.chat_room_idx = l.chat_room_idx
+			INNER JOIN 	users u ON u.user_idx = c.user_idx
+			WHERE   	u.user_idx <> #{userIdx}
+		]]>
+	</select>
+	
+	<!-- 안 읽은 메시지 개수 -->
+	<select id="countUnread" resultType="Integer">
+		<![CDATA[
+			SELECT 	COUNT(*)
+			FROM 	unread
+			WHERE 	user_idx = #{userIdx} AND message_idx IN (SELECT message_idx FROM message WHERE chat_room_idx = #{chatRoomIdx})
+		]]>
+	</select>
+	
+	<!-- 채팅방에 저장되어 있는 메시지 -->
+	<select id="getMessage" resultType="com.wayble.dto.MessageInfoDto">
+		<![CDATA[
+			SELECT		c.name, u.profile, u.nickname, u.user_idx userIdx, m.send_time sendTime, m.content
+			FROM 		message m
+			LEFT JOIN 	users u ON u.user_idx = m.user_idx
+			INNER JOIN 	chat c ON c.chat_room_idx = m.chat_room_idx
+			WHERE 		m.chat_room_idx = #{chatRoomIdx}
+			ORDER BY	message_idx
+		]]>
+	</select>
+	
+	<!-- 메시지 저장하기 -->
+	<insert id="saveMessage" parameterType="com.wayble.dto.MessageDto">
+		<selectKey keyProperty="messageIdx" resultType="int" order="BEFORE">
+			<![CDATA[
+				SELECT seq_message_idx.nextval FROM dual
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO	message (message_idx, chat_room_idx, user_idx, content)
+			VALUES		(#{messageIdx}, #{chatRoomIdx}, #{userIdx}, #{content})
+		]]>
+	</insert>
+	
+	<!-- 안 읽은 알림 추가하기 -->
+	<insert id="addUnread">
+		<![CDATA[
+			INSERT INTO	unread (user_idx, message_idx)
+			VALUES		(#{userIdx}, #{messageIdx})
+		]]>
+	</insert>
+	
+	<!-- 채팅방 인덱스로 참여하고 있는 사람 불러오기 -->
+	<select id="getChatMemberByChatRoomIdx" resultType="Integer">
+		<![CDATA[
+			SELECT	user_idx userIdx
+			FROM 	chat_member
+			WHERE 	chat_room_idx = #{chatRoomIdx}
+		]]>
+	</select>
+	
+	<!-- 안 읽었던 알림 읽기 -->
+	<delete id="readAllMessage">
+		<![CDATA[
+			DELETE FROM	unread
+			WHERE 		message_idx IN (SELECT		u.message_idx
+										FROM        unread u
+										INNER JOIN  message m ON u.message_idx = m.message_idx
+										WHERE       m.chat_room_idx = #{chatRoomIdx} AND u.user_idx = #{userIdx})
+		]]>
+	</delete>
+	
+	<!-- 전체 오픈채팅방 목록 -->
+	<select id="loadOpenChatList" resultType="com.wayble.dto.ChatDetailDto">
+		<![CDATA[
+			SELECT		c.chat_room_idx chatRoomIdx, captain_user_idx captainUserIdx, name, category, description, limit, 
+						(SELECT COUNT(*) FROM chat_member m WHERE c.chat_room_idx = m.chat_room_idx) currJoin
+			FROM    	chat c
+			WHERE   	c.limit <> 2
+		]]>
+	</select>
+	
+	<!-- 검색으로 오픈채팅방 찾기 -->
+	<select id="loadOpenChatListBySearch" resultType="com.wayble.dto.ChatDetailDto">
+		<![CDATA[
+			SELECT		c.chat_room_idx chatRoomIdx, captain_user_idx captainUserIdx, name, category, description, limit, 
+						(SELECT COUNT(*) FROM chat_member m WHERE c.chat_room_idx = m.chat_room_idx) currJoin
+			FROM    	chat c
+			WHERE   	c.limit <> 2 AND (name LIKE #{search} OR description LIKE #{search})
+		]]>
+	</select>
+	
+	<!-- 채팅방 인덱스로 채팅방 상세 얻기 -->
+	<select id="getChatDetailDtoByChatRoomIdx" resultType="com.wayble.dto.ChatDetailDto">
+		<![CDATA[
+			SELECT		c.chat_room_idx chatRoomIdx, captain_user_idx captainUserIdx, name, category, description, limit, 
+						(SELECT COUNT(*) FROM chat_member m WHERE c.chat_room_idx = m.chat_room_idx) currJoin
+			FROM    	chat c
+			WHERE   	c.limit <> 2 AND c.chat_room_idx = #{chatRoomIdx}
+		]]>
+	</select>
+	
+	<!-- 오픈채팅방 만들기 -->
+	<insert id="makeOpenChat" parameterType="com.wayble.dto.ChatDetailDto">
+		<selectKey keyProperty="chatRoomIdx" resultType="int" order="BEFORE">
+			<![CDATA[
+				SELECT seq_chat_room_idx.nextval FROM dual
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO	chat (chat_room_idx, captain_user_idx, name, category, description, limit)
+			VALUES		(#{chatRoomIdx}, #{captainUserIdx}, #{name}, #{category}, #{description, jdbcType=VARCHAR}, #{limit})
+		]]>
+	</insert>
+	
+	<!-- 1 : 1 채팅방 만들기 -->
+	<insert id="makePrivateChat" parameterType="com.wayble.dto.ChatDetailDto">
+		<selectKey keyProperty="chatRoomIdx" resultType="int" order="BEFORE">
+			<![CDATA[
+				SELECT seq_chat_room_idx.nextval FROM dual
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO	chat (chat_room_idx, captain_user_idx)
+			VALUES		(#{chatRoomIdx}, #{captainUserIdx})
+		]]>
+	</insert>
+	
+	<!-- 채팅방 참여하기 -->
+	<insert id="addChatMember">
+		<![CDATA[
+			INSERT INTO chat_member (chat_room_idx, user_idx)
+			VALUES		(#{chatRoomIdx}, #{userIdx})
+		]]>
+	</insert>
+	
+	<!-- 채팅방 나가기 -->
+	<delete id="deleteChatMember">
+		<![CDATA[
+			DELETE FROM	chat_member
+			WHERE 		chat_room_idx = #{chatRoomIdx} AND user_idx = #{userIdx}
+		]]>
+	</delete>
+	
+	<!-- 채팅방 인덱스로 1:1 채팅방 상세 -->
+	<select id="getPrivateChatRoomByChatRoomIdx" resultType="com.wayble.dto.PrivateChatUserDto">
+		<![CDATA[
+			SELECT  	u.user_idx userIdx, u.nickname, u.profile, l.chat_room_idx chatRoomIdx
+			FROM    	(SELECT  	c.chat_room_idx
+						 FROM    	chat c
+						 INNER JOIN  chat_member m ON m.chat_room_idx = c.chat_room_idx
+						 WHERE   	c.limit = 2 AND m.user_idx = #{userIdx}) l
+			INNER JOIN 	chat_member c ON c.chat_room_idx = l.chat_room_idx
+			INNER JOIN 	users u ON u.user_idx = c.user_idx
+			WHERE   	u.user_idx <> #{userIdx} AND l.chat_room_idx = #{chatRoomIdx}
+		]]>
+	</select>
+	
+	<!-- 채팅방 인덱스로 오픈채팅방 상세 -->
+	<select id="getOpenChatRoomByChatRoomIdx" resultType="com.wayble.dto.ChatDetailDto">
+		<![CDATA[
+			SELECT		c.chat_room_idx chatRoomIdx, captain_user_idx captainUserIdx, name, category, description, limit, (SELECT COUNT(*) FROM chat_member m WHERE c.chat_room_idx = m.chat_room_idx) currJoin
+			FROM    	chat c
+			INNER JOIN 	chat_member m ON m.chat_room_idx = c.chat_room_idx
+			WHERE   	m.user_idx = #{userIdx} AND c.limit <> 2 AND c.chat_room_idx = #{chatRoomIdx}
+		]]>
+	</select>
+	
+
+
+</mapper>

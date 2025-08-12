@@ -1,0 +1,54 @@
+@charset "UTF-8";
+	* {
+		box-sizing: border-box;
+	}
+	.change-pw {  /* 비밀번호 변경 팝업창 */
+		border: 5px solid #C0C0C0;
+		border-radius: 12px;
+		position: absolute;
+		width: 484px;
+		height: 560px;
+		background-color: white;
+		right: 270px;
+    	top: 100px;
+    	display: none;
+    	z-index: 10;
+	}
+	.change-pw > h2 {
+		text-align: center;
+		font-size: 30px;
+		margin-top: 30px;
+	}
+	#input-bar {  
+		margin-bottom: 20px;
+	}
+	.input-bar input {  /* 비밀번호 입력창 */
+		width: 405px;
+	    height: 60px;
+	    margin-left: 30px;
+	    margin-top: 40px;
+	    padding: 15px;
+	    border-radius: 10px;
+	    font-size: 16px;
+	    border: 2px solid #C0C0C0;
+	}
+	.button-group {
+		display: flex;
+		justify-content: flex-end;
+		gap: 60px;
+		margin-top: 50px;
+		margin-right: 90px;
+	}
+	.btn-submit {  /* 수정 버튼 */
+		width: 120px;
+   		height: 50px;
+   		padding: 12px;
+   		font-size: 18px;
+   		background-color: #C0C0C0;
+	    border: none;
+	    border-radius: 25px;
+	    cursor: pointer;
+	}
+	.btn-submit:hover {
+		background-color: #808080;
+	}

@@ -1,0 +1,101 @@
+@charset "UTF-8";
+	* { box-sizing: border-box; }
+	.border { border: 1px solid red; }
+	.center { margin: 0 auto; }
+	.pic {
+		width: 40px;
+		height: 40px;
+	}
+	.head-pic {
+		width: 30px;
+		height: 30px;
+	}
+	#open-chat-log-more, #open-chat-log-x, .send > input[type='image'] {
+		width: 40px;
+		height: 40px;
+		background-color: white;
+		border: none;
+	}
+	#open-chat-log {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 530px;
+		height: 750px;
+		transform: translate(-50%, -50%);
+		border-radius: 30px;
+		border: 2px solid #8080805e;
+		display: none;
+		z-index: 10;
+		background-color: white;
+	}
+	#open-chat-log-header {
+		object-fit: cover;
+		margin: 30px 20px 30px 30px;
+		display: flex;
+	}
+	#open-chat-log-header > div:nth-child(1) {
+		font-size: 30px;
+	    width: 394px;
+	    overflow: hidden;
+	    text-overflow: ellipsis;
+	    white-space: nowrap;
+	}
+	.open-chat-log-content {
+		width: 525px;
+		height: 565px;
+		overflow-x: hidden;
+		overflow-y: scroll;
+	}
+	.log-start {
+		margin: 20px 0px 0px 20px;
+		width: 330px;
+		height: 50px;
+		display: flex;
+		object-fit: cover;
+	}
+	.log-start > div:nth-child(2) > div:nth-child(1) {
+		margin-top: 3px;
+	}
+	.log-start > div:nth-child(2) > div:nth-child(2) {
+		background-color: rgb(235, 235, 235);
+		border-radius: 20px;
+		font-size: 15px;
+		padding: 5px 10px;
+	}
+	.log-left {
+		display: inline-block;
+		background-color: rgb(235, 235, 235);
+		border-radius: 20px;
+		font-size: 15px;
+		padding: 5px 10px;
+		margin: 15px 0px 10px 59px; 
+		max-width: 330px;
+	}
+	.log-right {
+		text-align:right;
+	}
+	.log-right > div {
+		display: inline-block; 
+		background-color: rgb(235, 235, 235);
+		border-radius: 20px;
+		font-size: 15px;
+		padding: 5px 10px;
+		max-width: 330px;
+		margin: 10px 30px 5px 0px;
+	}
+	.send {
+		width: 490px;
+		height: 45px;
+		margin: 15px 0 0 20px;
+		display: flex;
+	}
+	.send > input[name='text'] {
+		width: 450px;
+		height: 40px;
+		border-radius: 20px;
+		border: 2px solid rgb(235, 235, 235);
+		font-size: 15px;
+		padding-left: 10px;
+		outline: none;
+	}

@@ -1,0 +1,155 @@
+@charset "UTF-8";
+
+	#email-main {  /* 이메일 주소 찾는 팝업창 */
+		border: 2px solid #C0C0C0;
+	    width: 515px;
+	    height: 400px;
+		background-color: white;
+		z-index: 10;
+		position: absolute;
+	    top: 120px;
+	    right: 15px;
+		border-radius: 30px;
+	    display: none;
+	}
+	#email-main > div:nth-child(1) {
+		width: 580px;
+		height: 90px;
+		margin-top: 30px;
+		margin-left: 30px;
+		display: flex;
+		flex-direction: column;
+	}
+	.email-title {
+		display: flex;
+		flex-direction: row;
+	}
+	.email-address {
+		font-size: 20px;
+		font-weight: bold;
+		margin-left: 5px;
+		margin-right: 125px;
+	}
+	.email-window-close {  /* 버튼 */
+		width: 40px;
+   		height: 40px;
+   		padding: 5px;
+   		font-size: 18px;
+   		font-weight: bold;
+   		background-color: white;
+	    border: none;
+	    border-radius: 20px;
+	    cursor: pointer;
+	    margin-left: 200px;
+	}
+	.email-window-close:hover {
+		background-color: white;
+	}
+	.close {
+		width: 25px;
+		height: 25px;
+		margin-top: -3px;
+	}
+	#email-search-bar {  /* 검색창 */
+		position: relative;
+		width: 250px;
+		margin-top: 8px;
+	}
+	#email-search-bar > input {  /* 검색창 이메일검색 글자 */
+		width: 450px;
+		padding: 8px 40px 8px 12px;
+		border-radius: 6px;
+		font-size: 16px;
+		border: 2px solid #C0C0C0;
+		box-sizing: border-box;
+	}
+	#email-search-bar > button > input {  /* 돋보기 */
+		position: absolute;
+		left: 0px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 20px;
+		height: 20px;
+		fill: #888;
+		pointer-events: none;
+	}
+	.search-icon {
+		position: absolute;
+		top: 54%;
+		left: 415px;
+		transform: translateY(-50%);
+		background: transparent;
+	    border: none;
+	    cursor: pointer;
+	    width: 30px;
+	    height: 30px;
+	}
+	.search-icon:hover {
+		border: 1px solid transparent;
+		background-color: transparent;
+	}
+	.search-img {  /* 버튼 */
+		width: 35px;
+   		height: 35px;
+   		padding: 5px;
+   		font-size: 18px;
+   		font-weight: bold;
+   		background-color: white;
+	    border: none;
+	    border-radius: 20px;
+	    cursor: pointer;
+	    margin-left: 180px;
+	}
+	.search-img:hover {
+		background-color: white;
+	}
+	#email-two {
+		width: 450px;
+		height: 180px;
+		margin-left: 30px;
+		display: flex;
+		flex-direction: column;
+		margin-top:20px;
+	}
+	#email-two > div {
+		font-size: 15px;
+	}
+	.email-profile-box {
+		width: 130px;
+		height: 70px;
+		margin-left: 10px;
+		margin-top: 5px;
+		margin-bottom: -15px;
+		display: flex;
+	    align-items: center;
+	    gap: 5px;
+	}
+	.email-profile {
+		width: 60px;
+		height: 60px;
+	}
+	.email {
+		font-size: 20px;
+	}
+	#email-three {
+		width: 450px;
+		height: 45px;
+		margin-left: 30px;
+		display: flex;
+		flex-direction: column;
+	}
+	.email-btn {
+		width: 80px;
+	    height: 35px;
+	    padding: 5px;
+	    font-size: 15px;
+	    border-radius: 15px;
+	    border: 2px solid #C0C0C0;
+	    background-color: white;
+	    color: black;
+	    margin-left: 370px;
+	    margin-top: -35px;
+	}
+	.email-btn:hover {
+		background-color: #C0C0C0;
+	}

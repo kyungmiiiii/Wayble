@@ -1,0 +1,714 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+
+<script>
+	const loginUserIdx = ${sessionScope.loginUserIdx};
+	const userIdx = ${info.userIdx};
+	let chatSubscription;
+	const socket = new SockJS('/Wayble/ws');
+	const stompClient = Stomp.over(socket);
+	
+	$(function() {
+		console.log(loginUserIdx == userIdx);
+		// 내 게시물만 수정 가능
+		if(loginUserIdx != userIdx) { $(".menu-list").css("display", "none"); }
+		// 팔로잉 팔로워 목록
+		$("input[name='list']").change(function() {
+			$("input[name=list]").parent().css("border-bottom", "");
+			if($(this).is(":checked")) {
+				$(this).parent().css("border-bottom", "2px solid black");
+			}
+			let type = $(this).attr("class");
+			getFollowList(type);
+		})
+		// 팔로우하기 
+		$(".follow-btn").click(function() {
+			addFollower(userIdx);
+		});
+		// 팔로잉 팔로워 목록 선택박스
+		$(document).on("click", ".follow-box", function() {
+			$(".option-box").remove();
+			let target = $(this).attr("data-user-idx");
+			showOptionBox(target);
+		})
+		// 팔로우 취소 & 팔로우하기
+		$(document).on("click", ".select-follow", function() {
+			let target = $(this).closest(".follow-box").attr("data-user-idx");
+			if($(this).text() == "팔로우 하기") addFollower(target);
+			else unfollow(target);
+		})
+		// 검색어로 팔로잉 & 팔로워 찾기
+		$("#search-bar").keypress(function(e) {
+			if(e.key === "Enter") {
+				const search = $(this).find("input[type='text']").val();
+				if(search == "") return;
+				searchUser(search);
+			}
+		});
+		$(".search-icon").click(function() {
+			const search = $(this).prev().val();
+			if(search == "") return;
+			searchUser(search);
+		});
+		// 게시글 하트 
+		$(".post-like > input").click(function() {
+			updatePostHeart($(this), "post");
+		});
+		// 게시글 수정 & 삭제 선택박스 
+		$(".menu-list").click(function() {
+			if($(this).next().css("display") === "block") {
+				$(".select-option").css("display", "none");
+				return;
+			}
+			$(this).next().css("display", "block");
+		});
+		// 게시글 삭제
+		$(".delete-post").click(function() {
+			deletePost($(this));
+		});
+		
+<!--chat-log------------------------------------------------------------------------------------->
+		// 창 여닫기
+		$(document).on("click", ".send-message", function() {
+			let target = $(this).closest(".follow-box").attr("data-user-idx");
+			let nickname = $(this).closest(".follow-box").find(".follow-nickname").text();
+			getPrivateChatRoomIdx(target, nickname);
+			let chatRoomIdx = $("#chat-log-header").attr("data-chat-room-idx");
+			$("#bg-screen").css("display", "block");
+			$('#chat-log').css('display', 'block');
+			deleteChatAlarm(target);
+		});
+		$('#chat-log-x').click(function() {
+			$('#chat-log').css('display', 'none');
+			$("#bg-screen").css("display", "none");
+			let chatRoomIdx = $(this).closest("#chat-log-header").attr("data-chat-room-idx");
+			chatSubscription.unsubscribe();
+		});
+		//메시지 보내기
+		$('#chat-log-send > input[name="text"]').keypress(function(e) {
+			if(e.keyCode == 13){
+				let message = $(this).val();
+				sendMessage(message, "private");
+				$(this).val("");
+			}
+		});
+		$('#chat-log-send > input[type="image"]').click(function() {
+			let message = $(this).prev().val();
+			sendMessage(message, "private");
+			$(this).prev().val("");
+		});
+		
+<!--sns-post-detail------------------------------------------------------------------------------------->
+		// 창 여닫기
+		$(".post-img").click(function() {
+			$('#bg-screen').css('display', 'block');
+			$('#post-detail').css('display', 'block');
+			loadPostDetail($(this));
+		});
+		$('.post-detail-x').click(function() {
+			$('#bg-screen').css('display', 'none');
+			$('#post-detail').css('display', 'none');
+			let postIdx = $("#post-detail").attr("data-post-idx");
+			let check = $(".post-detail-heart").is(":checked");
+			let countHeart = $(".post-detail-count-heart").text();
+			let countReply = $(".post-detail-count-reply").text();
+			$(`[data-post-idx=\${postIdx}]`).find(".post-like > input").prop("checked", check);
+			$(`[data-post-idx=\${postIdx}]`).find(".post-count-heart").text(countHeart);
+			$(`[data-post-idx=\${postIdx}]`).find(".post-count-reply").text(countReply);
+		});
+		// 게시글 하트 눌렀을 때
+		$(document).on("click", ".post-detail-heart", function() {
+			updatePostHeart($(this), "detail");
+		})
+		//댓글 달기
+		$(document).on("keypress", ".comment", function(e) {
+			if(e.key === "Enter" ){
+				let text = $(this).find("input[type='text']").val().trim();
+				if(text == "") return;
+				addReply($(this), text);
+				$(this).find("input[type='text']").val("");
+			}
+		});
+		$(document).on("click", ".arrow-click", function() {
+			let text = $(this).prev().val().trim();
+			if(text == "") return;
+			addReply($(this), text);
+			$(this).prev().val("");
+		});
+		//댓글 삭제
+		$(document).on("click", ".remove-reply", function() {
+			removeReply($(this));
+		});
+		// 댓글에 하트 누르기
+		$(document).on("click", ".reply-heart", function() {
+			updateReplyHeart($(this));
+		});
+		
+<!--sns-post-modify------------------------------------------------------------------------------------->
+		// 창 여닫기
+		$(".modify-post").click(function() {
+			$('#bg-screen').css('display', 'block');
+			$("#post-modify").css('display', 'block');
+			getClickedPost($(this));
+		});
+		$(".post-modify-x").click(function() {
+			$('#bg-screen').css('display', 'none');
+			$("#post-modify").css('display', 'none');
+		});
+		// 글자 수 카운트
+		$(".post-modify-text-detail").on("keyup", function() {
+			let len = $(this).val().length;
+			$("#post-modify-count-chat").html(len);
+		});
+		// 이미지 업로드 처리
+		$("input[type='file']").on("change", function() {
+		    const file = this.files[0];
+	        const reader = new FileReader(); // 파일을 브라우저에서 읽게 도와주는 API
+	        reader.onload = function(e) {
+	            const img = $("<img>").attr("src", e.target.result);
+	            $(".modify-img").append(img);  // 미리보기로 이미지 추가
+	        };
+	        reader.readAsDataURL(file);  // 파일을 base64 형식으로 읽어서 이미지 미리보기
+		});
+		// 이미지 삭제
+		$(".modify-img").on("click", "img", function() {
+			if(confirm("이미지를 삭제하시겠습니까?")) {
+				$(this).remove();
+			}
+		});
+		
+		
+		
+		
+		
+		
+		
+		
+	})
+
+
+	function getClickedPost(invoke) {
+		const postIdx = invoke.closest("[data-post-idx]").attr("data-post-idx");
+		const json_data = {
+			postIdx : postIdx,
+		};
+		const init = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("getPostDtoByPostIdx", init)
+		.then(response => response.json())
+		.then(data => {
+			console.log(data);
+			$("#post-modify").attr("data-post-idx", postIdx);
+			$(".camera").attr("src", "${pageContext.request.contextPath}/wayble_upload/" + data.img);
+			$(".post-modify-text-detail").attr("placeholder", data.content);
+			$("input[value='${data.openRange}']").prop("checked", true);
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+	}
+	
+	function deletePost(invoke) {
+		const postIdx = invoke.closest("[data-post-idx]").attr("data-post-idx");
+		const json_data = {
+			postIdx : postIdx,
+		};
+		const init = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch('deletePost', init)
+		.then(response => {
+			invoke.closest(".post-click").remove();
+			const oldPostCount = Number($(".post-count").text());
+			$(".post-count").text(oldPostCount - 1);
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+	}
+	
+	function updateReplyHeart(invoke) { 
+		let replyIdx = invoke.closest(".reply-box").attr("data-reply-idx");
+		isCheck = invoke.is(":checked");
+		const json_data = {
+				replyIdx : replyIdx,
+				userIdx : loginUserIdx,
+				isCheck : isCheck
+		};
+		const init = {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(json_data)
+		};
+		
+		fetch('updateReplyHeart', init)
+		.then(response => response.json())
+		.then(data => {
+			let result = data;
+			let before = Number(invoke.parent().next().text());
+			invoke.parent().next().text(before + result);
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+	}
+	
+	function removeReply(invoke) {
+		let replyIdx = invoke.closest("[data-reply-idx]").attr("data-reply-idx");
+		let userIdx = invoke.closest("[data-user-idx]").attr("data-user-idx");
+		const json_data = {
+				replyIdx : replyIdx,
+				userIdx : userIdx,
+		};
+		const init = {
+				method: "post",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(json_data)
+		};
+		fetch("deleteReply", init)
+		.then(response => {
+			invoke.closest(".reply-box").remove();
+			let old = $(".post-detail-count-reply").text();
+			$(".post-detail-count-reply").text(--old);
+		})
+		.catch(error => {
+			console.log("에러! : " + error);
+		});
+	}
+	
+	function addReply(invoke, text) {
+		let postIdx = invoke.closest("#post-detail").attr("data-post-idx");
+		const json_data = {
+				postIdx : postIdx,
+				userIdx : loginUserIdx,
+				content : text,
+		};
+		const init = {
+				method: "post",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(json_data)
+		};
+		fetch("addReply", init)
+		.then(response => response.json())
+		.then(data => {
+			let str = `	<div class="reply-box" data-reply-idx="\${data.replyIdx}">
+							<div><img src="\${data.profile}" class="post-detail-profile"/></div>
+							<div data-user-idx="\${loginUserIdx}">
+								<div class="post-detail-nickname"><b>\${data.nickname}</b></div>
+								<div class="post-detail-content">\${text}</div>
+								<button class="remove-reply">삭제</button>
+							</div>
+							<div>
+								<label>
+									<input type='checkbox' style='display: none;' class="reply-heart"/>
+									<img src="${pageContext.request.contextPath}/resources/img/icon_empty_heart.png" class="unchecked pic"/>
+									<img src="${pageContext.request.contextPath}/resources/img/icon_heart.png" class="checked pic"/>
+								</label>
+								<div class="post-detail-countHeart">0</div>
+							</div>
+						</div>`;
+			$(".post-detail-comment-list").prepend(str);
+			let old = Number($(".post-detail-count-reply").text());
+			$(".post-detail-count-reply").text(++old);
+			sendReplyAlarm(postIdx);
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+		
+	}
+	
+	function loadPostDetail(invoke) {
+		const postIdx = invoke.parent().attr("data-post-idx");
+		$("#post-detail").attr("data-post-idx", postIdx);
+		const json_data = {
+			postIdx : postIdx,
+			userIdx : loginUserIdx,
+		};
+		const init = {
+			method: "post",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("loadPostDetail", init)
+		.then(response => response.json())
+		.then(data => {
+			$(".post-detail-left").empty();
+			let str = `<div class="profile-start">
+							<img src="\${data.post.profile}" class="post-detail-profile"/>
+							<span class="nickname">\${data.post.nickname}</span>
+						</div>
+						<div class="post-detail-img">
+							<img src="${pageContext.request.contextPath}/wayble_upload/\${data.post.img}"/>
+						</div>
+						<div class="post-detail-nickname-box">
+							<span class="nickname_text">\${data.post.nickname}</span>
+							<span class='post-detail-text'>\${data.post.content}</span>
+						</div>
+						<div class="like-comment">
+							<label>
+								<input type='checkbox' style='display: none;'  class="post-detail-heart" \${data.post.checkHeart ? "checked" : ""}/>
+								<img src="${pageContext.request.contextPath}/resources/img/icon_empty_heart.png" class="unchecked pic"/>
+								<img src="${pageContext.request.contextPath}/resources/img/icon_heart.png" class="checked pic"/>
+							</label>
+							<span class="post-detail-count-heart">\${data.post.countHeart}</span>
+							<button class="talk-list"><img src="${pageContext.request.contextPath}/resources/img/icon_reply.png" class="talk"/></button>
+							<span class="post-detail-count-reply">\${data.post.countReply}</span>
+						</div>
+						<div class="comment">
+							<input type="text" placeholder="댓글 달기"/>
+							<button class="arrow-click">
+								<img src="${pageContext.request.contextPath}/resources/img/icon_send.png" class="arrow">
+							</button>
+						</div>`;
+			$(".post-detail-left").append(str);
+			$(".post-detail-comment-list").empty();
+			for(let i=0; i<data.reply.length; i++){
+				let mine = loginUserIdx == data.reply[i].userIdx;
+				let str = `	<div class="reply-box" data-reply-idx="\${data.reply[i].replyIdx}">
+								<div><img src="\${data.reply[i].profile}" class="post-detail-profile"/></div>
+								<div data-user-idx="\${data.reply[i].userIdx}">
+									<div class="post-detail-nickname"><b>\${data.reply[i].nickname}</b></div>
+									<div class="post-detail-content">\${data.reply[i].content}</div>
+									<button class="remove-reply" style="display: \${mine ? 'block' : 'none'};">삭제</button>
+								</div>
+								<div>
+									<label>
+										<input type='checkbox' style='display: none;' class="reply-heart" \${data.reply[i].checkHeart ? "checked" : ""}/>
+										<img src="${pageContext.request.contextPath}/resources/img/icon_empty_heart.png" class="unchecked pic"/>
+										<img src="${pageContext.request.contextPath}/resources/img/icon_heart.png" class="checked pic"/>
+									</label>
+									<div class="post-detail-countHeart">\${data.reply[i].countHeart}</div>
+								</div>
+							</div>`;
+				$(".post-detail-comment-list").append(str);
+			}
+		})
+		.catch(error => {
+			console.log("에러! : " + error);
+		});
+	}
+	
+	function updatePostHeart(invoke, from) {
+		let postIdx;
+		if(from == "post") {
+			postIdx = invoke.closest("[data-post-idx]").attr("data-post-idx");
+		} else if(from == "detail") {
+			postIdx = invoke.closest("[data-post-idx]").attr("data-post-idx");
+		}
+		isCheck = invoke.is(":checked");
+		const json_data = {
+				postIdx : postIdx,
+				userIdx : loginUserIdx,
+				isCheck : isCheck,	
+		};
+		const init = {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(json_data)
+		};
+		fetch("updatePostHeart", init)
+		.then(response => response.json())
+		.then(data => {
+			let result = Number(data);
+			let before = Number(invoke.parent().next().text());
+			invoke.parent().next().text(before + result);
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+	}
+	
+	function searchUser(search) {
+		$(".follow-box").css("display", "flex");
+		$(".follow-nickname").each(function(idx, item) {
+			if(!$(item).text().includes(search)) { $(item).closest(".follow-box").css("display", "none"); }
+		})
+	}
+	
+	function scrollDown(invoke) {
+		invoke.scrollTop(invoke[0].scrollHeight);
+	};
+	
+	function showSendMessage(message) {
+		let str = `	<div class='chat-log-right' data-user-idx="\${loginUserIdx}">
+						<div>\${message}</div>
+					</div>`;
+		$("#chat-log-content").append(str);
+		scrollDown($("#chat-log-content"));
+	}
+	
+	function sendMessage(message) {  
+		if(!stompClient.connected) {
+			connectSocket();
+		}
+		let chatRoomIdx = $("#chat-log-header").attr("data-chat-room-idx");
+		stompClient.send("/app/chat.send", {}, JSON.stringify({
+	        sender : loginUserIdx,
+	        content : message,
+	        chatRoomIdx : chatRoomIdx,
+	        type : "private",
+	    }));
+		showSendMessage(message);
+	}
+	
+	function connectSocket() {
+		stompClient.connect({}, function (frame) {
+		    console.log('Connected: ',frame);
+		});
+	}
+	
+	function readAllMessage(chatRoomIdx) {
+		const json_data = {
+			chatRoomIdx : chatRoomIdx,
+			userIdx : loginUserIdx,
+		};
+		const init = {
+			method: "post",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("readAllMessage", init)
+		.then(response => {
+			console.log("메시지 읽기 완료!!");
+		})
+		.catch(error => {
+			console.log("에러! : " + error);
+		});
+	}
+	
+	function subscribeChatTopic(chatRoomIdx) {
+		if(!stompClient.connected) {
+			connectSocket();
+		}
+		let subscription = stompClient.subscribe(`/topic/chat-room/\${chatRoomIdx}`, function (greeting) {
+			let socketData = JSON.parse(greeting.body);
+			updatePrivateChatRoom(socketData.chatRoomIdx);
+			updateOpenChatRoom(socketData.chatRoomIdx);
+			if(socketData.sender != loginUserIdx) {
+				showReceiveMessage(socketData);
+			}
+	    });
+		chatSubscription = subscription;
+	}
+	
+	function deleteChatAlarm(userIdx) {
+		const json_data = {
+			sendUserIdx : userIdx,
+		};
+		const init = {
+			method: "post",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("deleteChatAlarm", init)
+		.catch(error => {
+			console.log("에러! : " + error);
+		});
+	}
+	
+	function loadChatLog(chatRoomIdx) {
+		const json_data = {
+			chatRoomIdx : chatRoomIdx,
+		};
+		const init = {
+			method: "post",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("loadChatMessage", init)
+		.then(response => response.json())
+		.then(data => {
+			$("#chat-log-content").empty();
+			let lastSender = loginUserIdx;
+			for(let i=0; i<data.length; i++) {
+				let str;
+				if(data[i].userIdx == loginUserIdx) {
+					str = `	<div class='chat-log-right' data-user-idx="\${data[i].userIdx}">
+								<div>\${data[i].content}</div>
+							</div>`;
+					$("#chat-log-content").append(str);
+				} else {
+					if(lastSender != data[i].userIdx) {
+						str = `	<div class="chat-log-start" data-user-idx="\${data[i].userIdx}">
+									<div><img src="\${data[i].profile}"/></div>
+									<div>
+										<div>\${data[i].nickname}</div>
+										<div>\${data[i].content}</div>
+									</div>
+								</div>`;
+						$("#chat-log-content").append(str);
+					} else {
+						str = `	<div data-user-idx="\${data.sender}">
+									<div class="chat-log-left">\${data[i].content}</div>
+								</div>`;
+						$("#chat-log-content").append(str);
+					}
+				}
+				lastSender = data[i].userIdx;
+			}
+			scrollDown($("#chat-log-content"));
+		})
+		.catch(error => {
+			console.log("에러! : " + error);
+		});
+	}
+	
+	function getPrivateChatRoomIdx(target, nickname) {
+		const json_data = {
+			userIdx : target,
+			loginUserIdx : loginUserIdx,
+		}
+		const init = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("getPrivateChatRoomIdx", init)
+        .then(response => response.json())
+        .then(data => {
+        	$("#chat-log-header").attr("data-chat-room-idx", data);
+        	$("#chat-log-header").attr("data-chat-user-idx", target);
+        	$("#chat-log-header > span").empty();
+        	$("#chat-log-header > span").html(`<b>\${nickname}</b>`);
+        	loadChatLog(data); 
+			subscribeChatTopic(data);
+			readAllMessage(data);
+        })
+        .catch(function(error) {
+           alert("에러! : " + error);
+        });
+	}
+	
+	function unfollow(target) {
+		console.log(target);
+		console.log(loginUserIdx);
+		const json_data = {
+			userIdx : target,
+			loginUserIdx : loginUserIdx,
+		}
+		const init = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("unfollow", init)
+        .then(response => {
+        	$(".option-box").find(".select-follow").text("팔로우 취소");
+        })
+        .catch(function(error) {
+           alert("에러! : " + error);
+        });
+	}
+	
+	function showOptionBox(target) {
+		if(loginUserIdx == target) return;
+		const json_data = {
+			userIdx : target,
+			loginUserIdx : loginUserIdx,
+		}
+		const init = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("checkFollowing", init)
+        .then(response => response.json())
+        .then(data => {
+        	let str = `	<div class="option-box">
+		    	        	<button class="select-follow">팔로우 \${data ? "취소" : "하기"}</button> <br/>
+		    	        	<button class="send-message">메세지 보내기</button>
+		    	      	</div>`;
+		   	$(".ff-list").find(`[data-user-idx='\${target}']`).append(str);
+        })
+        .catch(function(error) {
+           alert("에러! : " + error);
+        });
+	}
+	
+	function addFollower(target) {
+		const json_data = {
+			userIdx : target,
+			loginUserIdx : loginUserIdx,
+		}
+		const init = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("addFollower", init)
+        .then(response => {
+        	let cnt = Number($(".follower-cnt").text());
+        	$(".follower-cnt").text(cnt + 1);
+        })
+        .catch(function(error) {
+           alert("에러! : " + error);
+        });
+	}
+	
+ 	function getFollowList(type) {
+		$(".ff-list").empty();
+		const json_data = {
+			type : type,
+			userIdx : userIdx,
+		}
+		const init = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data)
+		};
+		fetch("getFollowList", init)
+        .then(response => response.json())
+        .then(data => {
+        	for(let i=0; i<data.length; i++){
+    			let str = `	<div class="follow-box" data-user-idx="\${data[i].userIdx}">
+	    				      	<div class="follow-profile">
+		    			        	<img src="\${data[i].profile}"/>
+	    				      	</div>
+	    				      	<div class="follow-nickname">\${data[i].nickname}</div>
+    						</div>`;
+    			$(".ff-list").append(str);
+    		}
+        })
+        .catch(function(error) {
+           alert("에러! : " + error);
+        });
+ 	}
+</script>

@@ -1,0 +1,109 @@
+@charset "UTF-8";
+	* {
+		box-sizing: border-box;
+	}
+	#planner-hotel {
+		border: 2px solid #C0C0C0;
+		border-radius: 12px;
+		position: absolute;
+		width: 460px;
+		height: 450px;
+		margin-left: 700px;
+		margin-top: 180px;
+		background: white;
+		z-index: 10;
+		top: 0;
+		display: none;
+	}
+	#hotel-search-bar {  /* 검색창 */
+		position: relative;
+		width: 410px;
+		margin: 25px 0 10px 20px;
+	}
+	#hotel-search-bar > input {  /* 검색창 이메일검색 글자 */
+		width: 100%;
+		padding: 13px 45px 13px 12px;
+		border-radius: 6px;
+		font-size: 16px;
+		border: 2px solid #C0C0C0;
+		box-sizing: border-box;
+	}
+	
+	.search-icon {  /* 돋보기 */
+		width: 20px;
+		height: 20px;
+		position: absolute;
+		left: 370px;
+		top: 50%;
+		transform: translateY(-50%);
+		pointer-events: auto;
+		border: none;
+		background: none;
+	}
+	
+	.search-icon:hover {
+		border: 1px solid white;
+		background-color: white;
+	}
+	.hotel-box {
+	    width: 405px;
+	    height: 60px;
+	    border: none;
+	    background-color: white;
+	    text-align: left;
+	    margin-bottom: 10px;
+	}
+	.hotel-name {
+		font-size: 20px;
+    	font-weight: 700;
+   	    margin-bottom: 5px;
+	}
+	.hotel-box > span:nth-child(2) {
+	    color: purple;
+    	font-weight: 700;
+	}
+	.hotel-address {
+    	color: gray;
+	}
+	.hotel-box:hover {
+		border: 1px solid #C0C0C0;
+		background-color: white;
+	}
+	.search-result {
+	    height: 345px;
+        padding: 25px;
+	    overflow-x: hidden;
+	    overflow-y: scroll;
+	}
+	#hotel-map {
+	    width: 400px;
+	    height: 220px;
+	}
+	.hotel-info {
+		width: 400px;
+		height: 110px;
+		margin-top: 20px;
+	}
+	.hotel-info-name {
+		font-size: 25px;
+		font-weight: bold;
+	}
+	.hotel-info > span:nth-child(2) {
+		font-size: 15px;
+		font-weight: bold;
+		color: purple;
+	}
+	.add-hotel {
+	    width: 110px;
+	    height: 35px;
+	    border-radius: 10px;
+	    font-size: 15px;
+	    font-weight: bold;
+	    border: 2px solid #C0C0C0;
+	    background-color: white;
+	    margin-left: 287px;
+	    margin-top: 5px;
+	}
+	.add-hotel:hover {
+		background-color: #C0C0C0;
+	}

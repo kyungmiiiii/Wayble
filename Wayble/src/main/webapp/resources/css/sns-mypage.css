@@ -1,0 +1,373 @@
+@charset "UTF-8";
+@font-face {font-family: 'netmarbleB'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.1/netmarbleB.woff') format('woff'); font-weight: normal; font-style: normal; }
+	* { box-sizing: border-box; }
+	.logo {  /* 로고 버튼 */
+	    font-family: "netmarbleB";
+	    margin-top: 20px;
+    	margin-left: 260px;
+	    font-size: 50px;
+    	font-weight: bold;
+    	color: #3089FF;
+    	
+		border: none;
+		cursor: pointer;
+		width: 205px;
+		height: 55px;
+		margin-bottom: 12px;
+		padding: 5px;
+		border-radius: 10px;
+		background: white;
+		
+		display: inline-block;
+	    line-height: 65px;    
+    	text-align: center;   
+
+	    text-decoration: none;
+		
+	}
+	.logo:hover {
+		border: 1px solid white;
+		background-color: white;
+	}
+	#header2 {  /* 로고 아래 회색 선 */
+		border: 3px solid #C0C0C0;
+		margin-top: 15px;
+	 	margin-left: 240px;
+	  	width: 1396px;
+	}
+	#profile-container > div {  /* 프로필 박스 */
+		display: flex;
+		border: 3px solid #C0C0C0;
+		margin-top: 20px;
+	  	margin-left: 160px;
+	  	width: 380px;
+	    padding: 15px;
+	    border-radius: 20px;
+	    box-sizing: border-box;
+	    align-items: center;
+	}
+	.profile-box {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		flex: 1;
+	}
+	.profile-img {  /* 프로필 사진 */
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		margin-right: 15px;
+	}
+	.nickname {  /* 닉네임 글자 */
+		font-size: 22px;
+		font-weight: bold;
+		margin-bottom: 10px;
+		display: block;
+	}
+	.follow-btn {
+		margin-left: 20px;
+    	border: 1px solid black;
+    	background: white;
+    	border-radius: 5px;
+	}
+	.follow-btn:hover {
+		border: 1px solid lightgrey;
+		background-color: lightgrey;
+	}
+	.info-row {  /* 팔로워, 팔로잉, 게시글 */
+		display: flex;
+		justify-content: space-between;
+	  	width: 263px;
+  	    margin-left: -20px;
+	}
+	.info-box {
+		display: flex;
+		flex-direction: column;
+		text-align: center;
+		flex: 1;
+	}
+	.label {  /* 팔로워, 팔로잉, 게시글 글자 */
+		font-size: 15px;
+		color: black;
+	}
+	.number {  /* 팔로워, 팔로잉, 게시글 숫자 */
+		font-weight: bold;
+		font-size: 16px;
+		margin-bottom: 2px;
+	}
+	#main {  /* 가로 회색선 아래 부분 전체 */
+		display: flex;
+		align-items: flex-start;	
+	}
+	#left-column {  /* 세로 회색선 왼쪽 부분 전체 */
+		display: flex;
+		flex-direction: column;
+		margin-left: 100px;
+	}
+	#post-scroll {  /* 스크롤 기능 */
+		overflow-x: hidden;
+		overflow-y: scroll;
+		scrollbar-width: none;
+		width: 1265px;
+		height: 700px;
+	}
+	#profile-container {  /* 프로필 전체 */
+		margin-bottom: 20px;
+	}
+	#post-container {  /* 게시글 전체 */
+		display: flex;
+		flex-wrap: wrap;
+		gap: 25px;
+		margin-left: 160px;
+		font-size: 20px;
+	}
+	.post-click {
+		border: none;
+		cursor: pointer;
+		width: 345px;
+		height: 345px;
+		margin-bottom: 12px;
+		padding: 15px;
+		border-radius: 10px;
+		background-color: white;
+		box-sizing: border-box;
+	    box-shadow: 0 15px 30px 0 rgba(31, 38, 135, .08);
+	}
+	.post-click:hover {
+		border: 1px solid white;
+		background-color: white;
+	}
+	.post-img {  /* 게시글 */
+	    width: 310px;
+	    height: 210px;
+	    border-radius: 10px;
+	    margin-bottom: 10px;
+	    object-fit: contain;
+	}
+	.post-profile {
+	    width: 35px;
+	    height: 35px;
+	    border-radius: 50%;
+	    margin-right: 8px;
+	}
+	.post-like > img{
+		width: 30px;
+		height: 30px;
+	}
+	.post-nickname {
+		margin-right: 90px;
+	}
+	#header3 {  /* 게시글 오른쪽 회색 선 */
+		margin-left: 5px;
+		margin-top: 10px;
+		width: 3px;
+		background-color: #C0C0C0;
+		align-self: stretch;
+	}
+	#followers-following {  /* 팔로워, 팔로잉 박스 */
+		display: flex;
+		justify-content: space-evenly;
+		align-items: center;
+		width: 250px;
+		border: 2px solid #C0C0C0;
+		padding: 20px;
+		margin-top: 20px;
+		margin-left: 10px;
+		border-radius: 10px;
+		box-sizing: border-box;
+	}
+	#followers-following input[type="radio"] {
+		display: none;
+	}
+	.btn-submit {
+		display: inline-block;
+	    font-size: 18px;
+	    padding: 0px 15px;
+	    margin-right: 15px;
+	    background-color: white;
+	    border: none;
+	    cursor: pointer;
+	}
+	.btn-submit:hover {
+		text-decoration: none;
+		border-bottom: 3px solid lightgray;
+	}
+	input[type="radio"]:checked + .btn-submit {
+		border-bottom: 3px solid black;
+	}
+	#search-bar {  /* 검색창 */
+		position: relative;
+		width: 250px;
+		margin-left: 10px;
+		margin-top: 15px;
+		box-shadow: 0 2px 8px 0 rgba(31, 38, 135, .08);
+	}
+	#search-bar > input {  /* 검색창 이름검색 글자 */
+		width: 100%;
+		padding: 8px 40px 8px 12px;
+		border-radius: 6px;
+		font-size: 16px;
+		border: 2px solid #C0C0C0;
+		box-sizing: border-box;
+	}
+	#search-bar > svg {  /* 돋보기 */
+		position: absolute;
+		right: 12px;
+		top: 50%;
+		transform: translateY(-50%);
+		width: 20px;
+		height: 20px;
+		fill: #888;
+		pointer-events: none;
+	}
+	.search-icon {
+		position: absolute;
+		top: 50%;
+		left: 215px;
+		transform: translateY(-50%);
+		background: transparent;
+	    border: none;
+	    cursor: pointer;
+	    width: 30px;
+	}
+	.search-icon:hover {
+		border: 1px solid white;
+		background-color: white;
+	}
+	.ff-list {  /* 팔로워 목록 위치 */
+		display: flex;
+		flex-direction: column;
+		overflow-x: hidden;
+		overflow-y: scroll;
+		scrollbar-width: none;
+		width: 240px;
+		height: 680px;
+		padding: 10px;
+		gap: 10px;
+		border: 1px solid white;
+		margin-top: 20px;
+	}
+	.follow-box {
+        width: 130px;
+	    display: flex;
+	    margin-left: 130px;
+	    height: 55px;
+	    align-items: center;
+	    position: relative;
+	}
+	.follow-profile {
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		margin-left: -120px;
+	}
+	.follow-profile > img {  /* 프로필 사진 */
+		width: 45px;
+		height: 45px;
+		border-radius: 50%;
+		margin-right: 5px;
+	}
+	.follow-nickname {  /* 닉네임 글자 */
+		font-size: 18px;
+		font-weight: bold;
+	}
+	.option-box {
+        margin-top: 10px;
+        gap: 10px;
+        position: absolute;
+    }
+    .option-box button {
+	    padding: 3px 10px;
+     	border: none;
+     	border-radius: 4px;
+	    background-color: #eee;
+        cursor: pointer;
+    }
+    .option-box button:hover {
+        background-color: #ddd;
+    }
+    .option-box > button:nth-child(1) {
+   	    width: 93px;
+    	margin-bottom: 3px;
+    }
+	.sns-box {  /* 게시글 사진 아래 내용 + 프로필 + 닉네임 + 하트 + 댓글 */
+		width: 305px;
+		height: 50px;
+		margin-top: 15px;
+		display: flex;
+		position: relative;
+		align-items: center;
+		font-size: 18px;
+	}
+	.heart {
+		width: 30px;
+		height: 30px;
+		gap: 10px;
+		margin-left: 45px;
+	}
+	.talk {
+		width: 30px;
+		height: 30px;
+		gap: 10px;
+		margin-left: 10px;
+	}
+	.menu-list {
+		width: 25px;
+ 		height: 25px;
+  		margin-left: 5px;
+	}
+	.selete-option {
+		position: absolute;
+		background-color: white;
+		padding: 5px;
+		border-radius: 5px;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		flex-direction: column;
+		z-index: 10;
+		right: 0;
+		top: 100%;
+		width: 140px;
+	}
+	.selete-option button {
+     	border: none;
+     	border-radius: 4px;
+		padding: 6px 10px;
+	    background-color: #eee;
+        cursor: pointer;
+        margin-top: 5px;
+        width: 100%;
+        text-align: left;
+    }
+    .selete-option button:hover {
+        background-color: #ddd;
+	}
+	#bg-screen {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0,0,0,0.3);
+		z-index: 5;
+		display: none;
+	}
+
+	#followers-following label{
+		padding: 5px;
+	}	
+	.select-option {
+		display: none;
+	    position: absolute;
+	    left: 210px;
+	    bottom: -80px;
+	}
+	.select-option > button {
+	    width: 90px;
+	    padding: 7px;
+	    border: none;
+	    margin-bottom: 5px;
+	    font-size: 18px;
+	}
+	.nickname-follow {
+		display: flex;
+	}

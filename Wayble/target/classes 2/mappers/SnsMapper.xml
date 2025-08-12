@@ -1,0 +1,237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SnsMapper">
+	<!-- 유저기본키로 유저 기본 정보 얻기 -->
+	<select id="getUserInfo" resultType="com.wayble.dto.UsersDto">
+		<![CDATA[
+			SELECT 		user_idx AS userIdx, email, nickname, password, profile
+			FROM 		users
+			WHERE 		user_idx = #{userIdx}
+		]]>
+	</select>
+	
+	<!-- 팔로워 세기 -->
+	<select id="countFollower" resultType="int">
+		<![CDATA[
+			SELECT		COUNT(*)
+			FROM		follow
+			WHERE		followed_user_idx = #{followedUserIdx}
+		]]>
+	</select>
+	
+	<!-- 팔로잉 세기 -->
+	<select id="countFollowing" resultType="int">
+		<![CDATA[
+			SELECT		COUNT(*)
+			FROM		follow
+			WHERE		following_user_idx = #{followingUserIdx}
+		]]>
+	</select>
+	
+	<!-- 게시물 세기 -->
+	<select id="countPost" resultType="int">
+		<![CDATA[
+			SELECT		COUNT(*)
+			FROM		post
+			WHERE		user_idx = #{userIdx}
+		]]>
+	</select>
+	
+	<!-- 내가 올린 게시물 -->
+	<select id="getMyPostList" resultType="com.wayble.dto.PostInfoDto">
+		<![CDATA[
+			SELECT		u.profile, u.nickname, p.content, p.post_idx postIdx, p.img,
+						(SELECT COUNT(*) FROM heart h WHERE h.post_idx = p.post_idx AND h.user_idx = #{loginUserIdx}) checkHeart,
+						(SELECT COUNT(*) FROM heart h WHERE h.post_idx = p.post_idx) countHeart,
+						(SELECT COUNT(*) FROM reply r WHERE r.post_idx = p.post_idx) countReply
+			FROM		post p
+			INNER JOIN 	users u ON p.user_idx = u.user_idx
+			WHERE		p.user_idx = #{userIdx}
+			ORDER BY 	postIdx DESC
+		]]>
+	</select> 
+	
+	<!-- 나를 팔로우한 유저정보 -->
+	<select id="getFollowerList" resultType="com.wayble.dto.UsersDto">
+		<![CDATA[
+			SELECT 		u.user_idx AS userIdx, u.email, u.nickname, u.profile
+			FROM 		follow f
+			INNER JOIN	users u ON f.following_user_idx = u.user_idx
+			WHERE 		followed_user_idx = #{followedUserIdx}
+			ORDER BY	u.nickname ASC
+		]]>
+	</select>
+	
+	<!-- 내가 팔로우한 유저 정보 -->
+	<select id="getFollowingList" resultType="com.wayble.dto.UsersDto">
+		<![CDATA[
+			SELECT 		u.user_idx AS userIdx, u.email, u.nickname, u.profile
+			FROM		follow f
+			INNER JOIN	users u ON f.followed_user_idx = u.user_idx
+			WHERE		following_user_idx = #{followingUserIdx}
+			ORDER BY	u.nickname ASC
+		]]>
+	</select>
+	
+	<!-- 언팔로우 -->
+	<delete id="unfollow">
+		<![CDATA[
+			DELETE FROM		follow
+			WHERE			following_user_idx = #{loginUserIdx} AND followed_user_idx = #{userIdx}
+		]]>
+	</delete>
+	
+	<!-- 전체보기로 게시된 게시물 -->
+	<select id="getOpenPostList" resultType="com.wayble.dto.PostInfoDto">
+		<![CDATA[
+			SELECT		u.profile, u.nickname, p.content, p.post_idx postIdx, p.img,
+						(SELECT COUNT(*) FROM heart h WHERE h.post_idx = p.post_idx AND h.user_idx = #{userIdx}) checkHeart,
+						(SELECT COUNT(*) FROM heart h WHERE h.post_idx = p.post_idx) countHeart,
+						(SELECT COUNT(*) FROM reply r WHERE r.post_idx = p.post_idx) countReply
+			FROM		post p
+			INNER JOIN 	users u ON p.user_idx = u.user_idx
+			WHERE		p.open_range = 'public' OR (p.open_range = 'private' AND p.user_idx = #{userIdx})
+			ORDER BY 	postIdx DESC
+		]]>
+	</select>
+	
+	<!-- 내가 팔로우한 사람들의 게시물 -->
+	<select id="getFollowingPostList" resultType="com.wayble.dto.PostInfoDto">
+		<![CDATA[
+			SELECT		u.profile, u.nickname, p.content, p.post_idx postIdx, p.img,
+						(SELECT COUNT(*) FROM heart h WHERE h.post_idx = p.post_idx AND h.user_idx = #{userIdx}) checkHeart,
+						(SELECT COUNT(*) FROM heart h WHERE h.post_idx = p.post_idx) countHeart,
+						(SELECT COUNT(*) FROM reply r WHERE r.post_idx = p.post_idx) countReply
+			FROM		post p
+			INNER JOIN 	users u ON u.user_idx = p.user_idx
+			INNER JOIN 	(SELECT followed_user_idx FROM follow WHERE following_user_idx = #{userIdx}) f ON p.user_idx = f.followed_user_idx
+			WHERE		p.open_range = 'followers'
+			ORDER BY 	postIdx DESC
+		]]>
+	</select>
+	
+	<!-- 게시물에 하트 누르기 -->
+	<insert id="heartToPost">
+		<![CDATA[
+			INSERT INTO heart(post_idx, user_idx)
+			VALUES		(#{postIdx}, #{userIdx})
+		]]>
+	</insert>
+	
+	<!-- 게시물에 하트 취소 -->
+	<delete id="deletePostHeart">
+		<![CDATA[
+			DELETE FROM	heart
+			WHERE		post_idx = #{postIdx} AND user_idx = #{userIdx}
+		]]>
+	</delete>
+	
+	<!-- 게시물 기본키로 게시물 정보 -->
+	<select id="getPostInfoDtoByPostIdx" resultType="com.wayble.dto.PostInfoDto">
+		<![CDATA[
+			SELECT		u.profile, u.nickname, p.content, p.post_idx postIdx, img,
+						(SELECT COUNT(*) FROM heart h WHERE h.post_idx = p.post_idx AND h.user_idx = #{userIdx}) checkHeart, 
+						(SELECT COUNT(*) FROM heart h WHERE h.post_idx = p.post_idx) countHeart,
+						(SELECT COUNT(*) FROM reply r WHERE r.post_idx = p.post_idx) countReply
+			FROM		post p
+			INNER JOIN 	users u ON p.user_idx = u.user_idx
+			WHERE		p.post_idx = #{postIdx}
+		]]>
+	</select>
+	
+	<!-- 게시물에 달린 댓글 -->
+	<select id="getReplyList" resultType="com.wayble.dto.ReplyDetailDto">
+		<![CDATA[
+			SELECT		r.reply_idx replyIdx, post_idx postIdx, u.user_idx userIdx, r.content, u.profile, u.nickname,
+						(SELECT COUNT(*) FROM heart h WHERE h.reply_idx = r.reply_idx AND h.user_idx = #{userIdx}) checkHeart,
+						(SELECT COUNT(*) FROM heart h WHERE h.reply_idx = r.reply_idx) countHeart
+			FROM		users u INNER JOIN reply r ON u.user_idx = r.user_idx
+			WHERE   	post_idx = #{postIdx}
+			ORDER BY	replyIdx DESC
+		]]>
+	</select>
+	
+	<!-- 게시물에 댓글 추가하기 -->
+	<insert id="addReply" parameterType="com.wayble.dto.ReplyDetailDto">
+		<selectKey keyProperty="replyIdx" resultType="int" order="BEFORE">
+			<![CDATA[
+				SELECT 	seq_reply_idx.nextval FROM dual
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO	reply(reply_idx, post_idx, user_idx, content)
+			VALUES		(#{replyIdx}, #{postIdx}, #{userIdx}, #{content})
+		]]>
+	</insert>
+	
+	<!-- 게시물 댓글에 하트 누르기 -->
+	<insert id="heartToReply">
+		<![CDATA[
+			INSERT INTO heart(reply_idx, user_idx)
+			VALUES		(#{replyIdx}, #{userIdx})
+		]]>
+	</insert>
+	
+	<!-- 게시물 댓글에 하트 취소 -->
+	<delete id="deleteReplyHeart">
+		<![CDATA[
+			DELETE 
+			FROM		heart
+			WHERE		reply_idx = #{replyIdx} AND user_idx =  #{userIdx}
+		]]>
+	</delete>
+	
+	<!-- 게시물 기본키로 게시물 얻기 -->
+	<select id="getPostDtoByPostIdx" resultType="com.wayble.dto.PostDto">
+		<![CDATA[
+			SELECT 		post_idx postIdx, user_idx userIdx, open_range openRange, content
+			FROM 		post
+			WHERE 		post_idx = #{postIdx}
+		]]>
+	</select>
+	
+	<!-- 댓글 삭제하기 -->
+	<delete id="deleteReply">
+		<![CDATA[
+			DELETE 
+			FROM 		reply
+			WHERE 		reply_idx = #{replyIdx} AND user_idx = #{userIdx}
+		]]>
+	</delete>
+	
+	<!-- 게시물 추가하기 -->
+	<insert id="addPost" parameterType="com.wayble.dto.PostDto">
+		<![CDATA[
+			INSERT INTO post (post_idx, user_idx, open_range, content, img)
+			VALUES		(seq_post_idx.nextval, #{userIdx}, #{openRange}, #{content}, #{img})
+		]]>
+	</insert>
+	
+	<!-- 팔로우 하기 -->
+	<insert id="addFollower">
+		<![CDATA[
+			INSERT INTO	follow (following_user_idx, followed_user_idx)
+			VALUES		(#{loginUserIdx}, #{userIdx})
+		]]>	
+	</insert>
+	
+	<!-- 팔로우하고 있는지 아닌지 확인 -->
+	<select id="checkFollowing" resultType="Integer"> 
+		<![CDATA[	
+			SELECT  COUNT(*)
+			FROM 	follow
+			WHERE 	following_user_idx = #{loginUserIdx} AND followed_user_idx = #{userIdx}
+		]]>
+	</select>
+	
+	<!-- 게시물 삭제 -->
+	<delete id="deletePost">
+		<![CDATA[
+			DELETE FROM	post
+			WHERE 		post_idx = #{postIdx}
+		]]>
+	</delete>
+	
+</mapper>

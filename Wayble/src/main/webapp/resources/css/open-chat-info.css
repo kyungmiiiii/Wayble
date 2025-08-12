@@ -1,0 +1,147 @@
+@charset "UTF-8";
+	.flex { display: flex; }
+	#open-chat-info {  /* 오픈채팅방 찾기 팝업창 */
+		border: 5px solid #C0C0C0;
+		border-radius: 70px;
+	    width: 530px;
+	    height: 800px;
+	    margin: 385px auto;
+	    box-sizing: border-box;
+	    background-color: white;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -100%);
+		display: none;
+		z-index: 20;
+	}
+	#open-chat-info-one {
+		width: 470px;
+		height: 130px;
+		margin-top: 30px;
+		margin-left: 20px;
+		display: flex;
+		flex-direction: column;
+	}
+	#open-chat-info-one > div:nth-child(1) {
+		display: flex;
+		height: 50px;
+	}
+	.open-chat-info-font {  /* 오픈채팅 찾기 글자 */
+		margin-left: 10px;
+		font-size: 28px;
+		font-weight: bold;
+	}
+	.open-chat-info-x {
+		width: 30px;
+		height: 30px;
+		margin-left: 330px;
+	}
+	
+	.chat-room-title {
+		padding: 10px;
+		border-radius: 10px;
+		margin-bottom: 10px;
+		border: none;
+	}
+	.chat-room-title > div:nth-child(1) {
+		display: flex;
+		height: 35px;
+	}
+	.chat-room-title > div:nth-child(1) > div:nth-child(1) {
+		width: 25px;
+		height: 25px;
+		border-radius: 10px;
+		margin-top: 3px;
+	}
+	.chat-room-title > div:nth-child(1) > div:nth-child(2) {
+		align-content: center;
+		margin-left: 5px;
+		font-size: 16px;
+	}
+	.chat-room-title > div:nth-child(2) {
+		font-size: 15px;
+	    width: 485px;
+	    text-align: left;
+	    margin-left: 5px;
+	}
+	
+	#open-chat-info-two {
+		width: 470px;
+		height: 245px;
+		margin-left: 20px;
+	}
+	#open-chat-info-two > div:nth-child(1) {
+		font-size: 20px;
+		font-weight: bold;
+	}
+	#open-chat-info-two > div:nth-child(2) {
+		height: 175px;
+		border-radius: 15px;
+		padding: 10px;
+	}
+	.text {
+		font-size: 15px;
+		color: gray;
+		margin-left: 10px;
+		margin-top: 10px;
+		padding: 10px;
+	}
+	.warning {
+		font-size: 15px;
+		color: red;
+		font-weight: bold;
+	    margin-top: 5px;
+	}
+	#open-chat-info-three {
+		width: 470px;
+		height: 290px;
+		margin-left: 20px;
+	}
+	.member {  /* 참여 맴버 글자 */
+		font-size: 20px;
+		font-weight: bold;
+	}
+	.open-chat-info-profile {
+		overflow-x: hidden;
+		overflow-y: scroll;
+		width: 470px;
+		height: 250px;
+	}
+	.profile-box {
+		width: 130px;
+		height: 70px;
+		margin-left: 10px;
+		margin-top: 5px;
+		margin-bottom: -15px;
+		display: flex;
+	    align-items: center;
+	    gap: 5px;
+	}
+	.profile {
+		width: 50px;
+		height: 50px;
+		border-radius: 50%;
+	}
+	.nickname {
+		font-size: 20px;
+	}
+	#open-chat-info-four {
+		display: flex;
+		align-content: center;
+		justify-content: center;
+		width: 510px;
+		height: 70px;
+	}
+	.chat-room-join {
+		width: 475px;
+	    height: 50px;
+	    padding: 5px;
+	    font-size: 20px;
+	    border-radius: 15px;
+	    border: 2px solid #C0C0C0;
+	    background-color: white;
+	}
+	.chat-room-join:hover {
+		background-color: gray;
+	}

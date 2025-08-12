@@ -1,0 +1,244 @@
+@charset "UTF-8";
+@font-face {font-family: 'netmarbleB'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.1/netmarbleB.woff') format('woff'); font-weight: normal; font-style: normal; }
+	.logo {  /* 로고 버튼 */
+	    font-family: "netmarbleB";
+	    margin-top: 20px;
+    	margin-left: 230px;
+	    font-size: 50px;
+    	font-weight: bold;
+    	color: #3089FF;
+    	
+		border: none;
+		cursor: pointer;
+		width: 205px;
+		height: 65px;
+		margin-bottom: 12px;
+		padding: 5px;
+		border-radius: 10px;
+		background-color: white;
+	}
+	.logo:hover {
+		border: 1px solid white;
+		background-color: white;
+	}
+	#profile {
+	    width: 670px;
+	    height: 170px;
+	    margin-left: 250px;
+	    margin-top: 30px;
+	}
+	#profile-img-wrapper { /* 프로필사진, 닉네임, 닉네임 수정 위치 */
+		position: relative;
+		display: inline-block;
+		padding-left: 50px;
+		padding-top: 0px;
+		width: 400px;
+		height: 170px;
+	}
+	.profile-img { /* 프로필 사진 */
+	 	border-radius: 100px;
+	    height: 170px;
+	    width: 180px;
+	}
+	.plus-button {  /* 플러스 버튼 */
+		position: absolute;
+	    bottom: 660px;
+	    right: 1490px;
+	    width: 30px;
+	    height: 30px;
+	    cursor: pointer;
+	}
+	.nickname-wrapper {
+		display: flex;
+		align-items: center;
+		flex-wrap: nowrap;
+		margin-left: 250px;
+		margin-top: -85px;
+	}
+	.name {
+		flex: 1;
+	}
+	.nickname { /* 닉네임 */
+		font-family: "netmarbleB";
+		font-size: 35px;
+		font-weight: bold;
+		cursor: pointer;
+		word-break: break-all;  /* 줄바꿈 */
+		outline: none;
+		border: none;
+		width: 335px;
+	}
+	.update-nickname { /* 수정 버튼 */
+		font-size: 15px;
+		font-weight: bold;
+		padding: 5px 12px;
+	    border: 1px solid #C0C0C0;
+		border-radius: 15px;
+	    background-color: white;
+	    margin-right: 25px;
+	}
+	.update-nickname:hover {
+		background-color: #C0C0C0;
+	}
+	#current-planner{ /* 작성 중인 여행 계획 위치 */
+		font-family: "netmarbleB";
+		position: absolute;
+		left: 250px;
+		top: 335px;
+		width: 600px;
+		height: auto;
+	}
+	#current-planner > div:nth-child(1) { /* 작성 중인 여행 계획 글자 */
+		font-size: 25px;
+		margin-bottom: 15px;
+	}
+	.container {
+	    display: flex;
+	    justify-content: space-between;
+	    width: 110%;
+	}
+    .planner-button {
+	    width: 155px;
+    	height: 210px;
+    	background-color: rgb(240, 248, 255);
+    	border: 1px solid rgb(240, 248, 255);
+    	border-radius: 12px;
+    	padding: 15px;
+    	box-sizing: border-box;
+    	cursor: pointer;
+    	transition: all 0.2s ease;
+	}
+	.planner-button:hover {
+		background-color: rgb(240, 248, 255);
+		transform: translateY(-5px);
+	}
+	.flex-item div:nth-child(1) {
+		font-size: 20px;
+		font-weight: bold;
+		text-align: center;
+	}
+	.flex-item div:nth-child(2) {
+		color: #FF69B4;
+		font-size: 16px;
+		text-align: center;
+		font-weight: 600;
+		margin-top: 5px;
+	}
+	.flex-item div:nth-child(3) {
+		font-size: 15px;
+		text-align: center;
+		line-height: 1.5;
+		margin-top: 10px;
+	}
+	#past-planner { /* 내 과거 여행 계획 위치 */
+		font-family: "netmarbleB";
+		position: absolute;
+		width: 600px;
+		height: auto;
+		left: 250px;
+		top: 590px;
+    }
+	#past-planner > div:nth-child(1) { /* 내 과거 여행 계획 글자 */
+		font-size: 25px;
+		margin-top: 20px;
+		margin-bottom: 15px;
+	}
+	.option { 
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 130px;
+	    height: 70px;
+		font-size: 20px;
+		font-weight: bold;
+	    border: 1px solid white;
+		border-radius: 15px;
+	    background-color: white;
+	    cursor: pointer;
+	    position: absolute;
+	    right: 120px;
+	    top: 30px;
+	}
+	.option span { /* 설정 */
+		font-family: "netmarbleB";
+	    font-size: 30px;
+	    font-weight: 100;
+	}
+	.option img { /* 톱니바퀴 이미지 */
+		width: 60px;
+		height: 30px;
+	}
+	#calendar { /* 달력 위치 */
+		position: absolute;
+		width: 800px;
+		height: 600px;
+		right: 140px;
+		top: 270px;
+	}
+	#calendar > img { /* 달력 */
+		position: absolute;
+	    width: 720px;
+	    top: 65px;
+	    right: 104px;
+	  	padding-left: 10px;
+	    padding-top: 10px;
+	}
+	#bg-none {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: transparent;
+		z-index: 10;
+		display: none;
+	}
+	#optionList {
+		position: absolute;
+		border: 1px solid lightgrey;
+		width: 230px;
+	    height: 160px;
+	    right: 7%;
+	    top: 11%;
+	    background : white;
+	    border-radius: 30px;
+	    box-shadow: 1px 1px 1px 1px lightgray;
+	    display: none;
+	}
+	#divLine {
+		position: absolute;
+	    width: 210px;
+	    right: 3%;
+	    top: 48%;
+	    border-top: 1px solid black;
+	}
+	#optionList > button {
+		width: 200px;
+	    height: 60px;
+	    margin: 10px 15px 10px 15px;
+	    border: none;
+	    border-radius: 30px;
+	    background: white;
+	    font-size: 18px;
+	    font-weight: 600px;
+	    cursor: pointer;
+	}
+	#optionList > button:hover {
+		background : #F7F7F7;
+	}
+	label[for='plus'] {
+		position: absolute;
+	    background: url(../img/icon_plus.png);
+	    background-size: 40px;
+	    cursor: pointer;
+	    width: 42px;
+	    height: 38px;
+	    border: none;
+	    left: 21%;
+    	top: 26%;
+	}
+	form > input[type='file'] {
+		display: none;
+	}
+	
+	

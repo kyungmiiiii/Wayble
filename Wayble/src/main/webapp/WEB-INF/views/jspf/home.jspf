@@ -1,0 +1,245 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script> <!-- date range picker -->
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.5.1/dist/sockjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<script>
+	
+	let loginUserIdx = `${sessionScope.loginUserIdx}`;
+	const socket = new SockJS('/Wayble/ws');
+	const stompClient = Stomp.over(socket);
+	
+	$(function() {
+		if(loginUserIdx != "") {
+			connectSocket();
+			showUnreadAlarm();
+		}
+		
+		// 도시 검색
+		$('.click-search').click(function() {
+			getCityListBySearch();
+		})
+		$("#search-bar").keypress(function(e) {
+			if(e.key === "Enter") {
+				getCityListBySearch();
+			}
+		});
+		// 리뷰 페이지로 넘어가기
+		 $(".content3-item").click(function() {
+         let plannerIdx = $(this).attr("data-planner-idx");
+         location.href = "plannerReview?plannerIdx=" + plannerIdx;
+      });
+
+<!--alarm------------------------------------------------------------------------------------------------------------>
+		$('#open-alarm').click(function(){
+			if($('#alarm-box').css('display')=='none') {
+				$(".new-alarm").css("display", "none");
+				$("#alarm-box").find(".alarm-content-list").remove();
+				const json_data = {
+					login_user_idx : "${loginUserIdx}"
+				};
+				const init01 = {
+					method: "POST",
+					headers: {
+						/* "Content-Type": "application-json" */
+					},
+					body: JSON.stringify(json_data)
+				};
+				
+				fetch('alarm', init01)
+				.then(function(response) {
+					return response.json()
+				})
+				.then(function(arr) {
+					console.log(arr);
+					for(let i=0; i<=arr.length-1; i++) {
+						let str = `
+							<div class="alarm-content-list" alarm_idx="\${arr[i].alarmIdx}">	
+								<div class="alarm-content" class="center">
+									<div>\${arr[i].content}</div>
+								</div>
+								<div class="alarm-content-time" class="center">
+									<div>\${arr[i].createdTime}</div>
+								</div>
+							</div>
+						`;
+						$("#alarm-box").append(str);
+					}
+				})
+				.catch(function(error) {
+					alert("에러! : " + error);
+				});
+			}
+			$('#alarm-box').fadeToggle();
+		});
+		
+<!--cityDetail------------------------------------------------------------------------------------->
+		$('#content1').on('click','.click-content1',function(){
+			let city_idx = $(this).parent().attr("data-city-idx");
+			
+			// ajax(fetch) - data: city_idx
+			const json_data = {
+				city_idx : city_idx
+			};
+			const init01 = {
+				method: "POST",
+				headers: {
+					/* "Content-Type": "application-json" */
+				},
+				body: JSON.stringify(json_data)
+			};
+			fetch('cityDetail', init01)
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(data) {
+				$("#city-detail-content > div:first-child > div:nth-child(1)").text(data.nameEng);
+				$("#city-detail-content > div:first-child > div:nth-child(1)").text(data.name_eng);
+				$("#city-detail-content > div:first-child > div:nth-child(2)").html("<b>" + data.name + "</b>");
+				$("#city-detail-content > div:first-child > div:nth-child(3)").text(data.description);
+				$("#city-detail-content > div:last-child > img").attr("src", data.pic);
+				$("#city-detail").attr("data-city-idx", city_idx);
+			})
+			.catch(function(error) {
+				alert("에러! : " + error);
+			});
+			
+			// .then에서			
+				$('#city-detail').css('display','block');
+				$('#bg-screen').css('display','block');
+				$('body').css('overflow','hidden');
+		})
+		$('#city-detail-x').click(function(){
+			$('#city-detail').css('display','none');
+			$('#bg-screen').css('display','none');
+			$('body').css('overflow','scroll');
+		});
+		$('#city-detail-next').click(function(){
+			$('#city-detail').css('display','none');
+			$('#select-date').css('display','block');
+		})
+		$('#bg-screen').click(function(){
+			$('#city-detail').css('display','none');
+			$('#select-date').css('display','none');
+			$('#bg-screen').css('display','none');
+			$('body').css('overflow','scroll');
+		})
+	
+<!--selectDate------------------------------------------------------------------------------------->
+		// 창 여닫기
+		$('#city-detail-next').click(function(){
+			if(loginUserIdx == ``) {
+				alert("로그인 후 이용하실 수 있습니다.");
+				location.href=`${pageContext.request.contextPath}/loginForm`;
+			}
+			$('#select-date').css('display', 'block');
+	        $('#city-detail').css('display', 'none');
+	        $("#div_date_range_picker > input[type='text']").data('daterangepicker').show();  // date-range-picker 띄움.
+		});
+		$('#bg-screen').click(function(){
+			$('#city-detail').css('display','none');
+			$('#select-date').css('display','none');
+			$('#bg-screen').css('display','none');
+			$('body').css('overflow','scroll');
+		})
+		$("#div_date_range_picker > input[type='text']").daterangepicker({
+          autoApply: true,
+          parentEl: "#div_date_range_picker",
+          autoUpdateInput: true,
+       }, function(start, end, label) {
+          $("#div_date_range_picker > input[type='text']").data('daterangepicker').show();  // date-range-picker 다시 띄움.
+//          $(this).data('daterangepicker').inline = true; 
+       }).on('apply.daterangepicker', function(ev, picker) {
+          $("#div_date_range_picker > input[type='text']").data('daterangepicker').show();  // date-range-picker 다시 띄움.
+       });
+	   
+       // 날짜범위선택 후 "선택"버튼 클릭시
+      $("#select-date-next").click(function() {
+          let dateSelected = $("#div_date_range_picker > input[type='text']").val();
+          dateSelected = dateSelected.replaceAll(" ", "");
+          let cityIdx = $("#city-detail").attr("data-city-idx");
+          location.href=`${pageContext.request.contextPath}/planner/start?cityIdx=\${cityIdx}&travelDate=\${dateSelected}`;
+       });
+	});
+	
+	function showUnreadAlarm() {
+		const json_data = {
+			userIdx : loginUserIdx,
+		};
+		const init = {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(json_data),
+		};
+		fetch("getUnreadAlarm", init)
+		.then(response => response.json())
+		.then(data => {
+			if(data) { $(".new-alarm").css("display", "block"); }
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+	}
+	
+	function logout() {
+		if(confirm('로그아웃하시겠습니까?')){
+			alert('로그아웃 되었습니다.');
+			location.href = 'logout';
+		}
+	};
+	
+	function connectSocket() {
+		stompClient.connect({}, function (frame) {
+		    console.log('Connected: ',frame);
+		    subscribeDefaultTopics();
+		});
+	}
+	
+	function subscribeDefaultTopics() {
+		stompClient.subscribe(`/topic/alarm/\${loginUserIdx}`, function (greeting) {
+			if($(".new-alarm").length == 0) {
+				$(".alarm-bell").append(`<div class="new-alarm">N</div>`);
+			}
+	    });
+	}
+
+	function getCityListBySearch() {
+		$("#content1 > .content1-item").remove();
+		let search = $('#search').val();
+		const json_data = {
+				search : search
+		};
+		const init = {
+				method: "POST",
+				headers: {
+					/* "Content-Type": "application/json" */
+				},
+				body: JSON.stringify(json_data),
+		};
+		fetch("searchCity", init)
+		.then(response => response.json())
+		.then(data => {
+			$('#content1').empty();
+			for(let i=0; i<data.length; i++){
+				if(i==8) break;
+				let str = `	<div class="content1-item" data-city-idx="\${data[i].cityIdx}">
+								<img src="\${data[i].pic}"/>
+								<div>\${data[i].nameEng}</div>
+								<div>\${data[i].name}</div>
+								<input type="submit" class="click-content1">
+							</div>`;
+				
+				$("#content1").append(str);
+			}
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+	}
+	
+
+</script>

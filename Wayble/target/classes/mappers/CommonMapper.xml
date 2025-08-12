@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CommonMapper"> 
+	
+	<!-- 회원가입 -->
+	<insert id="signUp">	
+		<![CDATA[
+		INSERT INTO users(user_idx, email, nickname, password)
+	    VALUES(seq_user_idx.nextval, #{email}, #{nickname}, #{password})
+		]]>
+	</insert>
+	
+	<!-- 로그인 -->
+	<select id="loginUsers" resultType="Integer">	
+		<![CDATA[
+		SELECT user_idx
+	    FROM users
+	    WHERE email=#{email} AND password=#{password}
+		]]>
+	</select>
+	
+	<!-- 전체 도시 정보 가져오기 -->
+	<select id="cityInfo" resultType="com.wayble.dto.CityDto">	
+		<![CDATA[
+		SELECT city_idx cityIdx,country,name,description,pic,lat,lng,name_ENG nameEng
+		FROM city
+		]]>
+	</select>
+	
+	<!-- city_idx로 맞는 도시정보 가져오기 -->
+	<select id="cityInfoSort" resultType="com.wayble.dto.CityDto">
+		<![CDATA[
+		SELECT city_idx cityIdx, country, name, description, pic, lat, lng, name_ENG nameEng
+		FROM city
+		WHERE city_idx=#{cityIdx}
+		]]>
+	</select>
+	
+	<!-- 해당 글자가 들어간 도시정보 가져오기(홈화면 검색) -->
+	<select id="searchCitylist" resultType="com.wayble.dto.CityDto">	
+		<![CDATA[
+		SELECT	city_idx cityIdx, country, name, description, pic, lat, lng, name_eng nameEng
+		FROM	city
+		WHERE	country LIKE #{search} OR name LIKE #{search}
+		]]>
+	</select>
+	
+	<!-- 유저인덱스로 기본정보 가져오기(홈,마이페이지 띄우기용) -->
+	<select id="userInfo" resultType="com.wayble.dto.UsersDto">
+		<![CDATA[
+		SELECT nickname,profile,password
+		FROM users
+		WHERE user_idx = #{userIdx}
+		]]>
+	</select>
+	
+	<!-- 유저들의 전체정보 가져오기 -->
+	<select id="usersInfo" resultType="com.wayble.dto.UsersDto">
+		<![CDATA[
+		SELECT user_idx userIdx, email, nickname, password ,profile
+		FROM users
+		]]>
+	</select>
+	
+	<!-- 유저인덱스로 알람정보 가져오기(내림차순) -->
+	<select id="alarmList" resultType="com.wayble.dto.AlarmDto">
+		<![CDATA[
+		SELECT		alarm_idx alarmIdx, user_idx userIdx, read_YN readYN, origin, content, created_time createdTime
+		FROM 		alarm
+		WHERE 		user_idx = #{loginUserIdx}
+		ORDER BY	alarm_idx DESC
+		]]>
+	</select>
+	
+	<!-- 비밀번호 변경 -->
+	<update id="updatePassword">
+		<![CDATA[
+		UPDATE	users
+	    SET		password = #{newPassword}
+	    WHERE	user_idx = #{userIdx} AND password = #{password}
+		]]>
+	</update>
+	
+	<!-- 닉네임 변경 -->
+	<update id="updateNickname">
+		<![CDATA[
+		UPDATE	users
+		SET		nickname = #{newNickname}
+		WHERE	user_idx = #{userIdx}
+		]]>
+	</update>
+	
+	<!-- 프로필사진 변경 -->
+	<update id="updateProfile">
+		<![CDATA[
+		UPDATE	users
+		SET		profile = #{profile}
+		WHERE	user_idx = #{userIdx}
+		]]>
+	</update>
+	
+	<!-- 이메일로 유저정보 가져오기(비밀번호 초기화할때 사용) -->
+	<select id="useridxCheck" resultType="com.wayble.dto.UsersDto">
+		<![CDATA[
+		SELECT user_idx userIdx, email, nickname, password ,profile
+		FROM users
+		WHERE email = #{email}
+		]]>
+	</select>
+	
+	<!-- 유저인덱스로 유저정보 가져오기 -->
+	<select id="getUserInfo" resultType="com.wayble.dto.UsersDto"> 
+		<![CDATA[ 
+			SELECT 	user_idx userIdx, email, nickname, password, profile 
+			FROM 	users 
+			WHERE 	user_idx = #{loginUserIdx}
+		]]>
+	</select>
+	
+	<!-- 이메일과 비밀번호에 맞는 유저 기본정보 가져오기 -->
+	<select id="checkUser" resultType="com.wayble.dto.UsersDto"> 
+		<![CDATA[ 
+			SELECT	user_idx userIdx, email, nickname, password, profile 
+	        FROM 	users
+	        WHERE 	email = #{email} AND password = #{pw}
+		]]>
+	</select>
+	
+	<!-- 도시정보목록(내림차순) -->
+	<select id="loadCityList" resultType="com.wayble.dto.CityDto"> 
+		<![CDATA[
+			SELECT		city_idx cityIdx, country, name, description, pic, lat, lng, name_eng nameEng
+			FROM		city
+			ORDER BY	cityIdx DESC
+		]]>
+	</select>
+	
+	<!-- 도시인덱스로 도시정보 가져오기 -->
+	<select id="getCityDtoByCityIdx" resultType="com.wayble.dto.CityDto"> 
+		<![CDATA[ 
+			SELECT	city_idx cityIdx, country, name, description, pic, lat, lng, name_eng nameEng
+		   	FROM	city
+		   	WHERE 	city_idx = #{cityIdx}
+		]]>
+	</select>
+	
+	<!-- 알람 추가 -->
+	<insert id="addAlarm" parameterType="com.wayble.dto.AlarmDto">
+		<selectKey keyProperty="alarmIdx" resultType="int" order="BEFORE">
+			<![CDATA[
+				SELECT seq_alarm_idx.nextval FROM dual
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO alarm(alarm_idx, user_idx, read_yn, origin, content, send_user_idx)
+		    VALUES 		(#{alarmIdx}, #{userIdx}, 'N', #{origin}, #{content}, #{sendUserIdx})
+	    ]]>
+	</insert>
+	
+	<!-- 보낸유저 인덱스로 채팅알람삭제 (알림출처 = 채팅 인것) -->
+	<delete id="deleteChatAlarm">
+		<![CDATA[
+			DELETE FROM	alarm
+			WHERE		origin = '채팅' AND send_user_idx = #{sendUserIdx}
+		]]>	
+	</delete>
+	
+	<!-- <select id="alarmList" resultType="com.wayble.dto.AlarmDto">
+      <![CDATA[
+	      SELECT     alarm_idx alarmIdx, user_idx userIdx, read_YN readYN, origin, content, created_time createdTime
+	      FROM       alarm
+	      WHERE      user_idx = #{userIdx}
+	      ORDER BY   alarmIdx DESC
+      ]]>
+   </select> -->
+	
+	<!-- 알람 읽음처리 -->
+	<update id="readAlarm">
+		<![CDATA[
+			UPDATE 	alarm 
+			SET 	read_yn = 'Y' 
+			WHERE 	user_idx = #{userIdx}
+		]]>		
+	</update>
+	
+	<!-- 로그인 -->
+	<select id="checkLogin" resultType="com.wayble.dto.UsersDto">
+		<![CDATA[
+			SELECT 	user_idx userIdx, email, nickname, password, profile
+	        FROM 	users
+	        WHERE 	email = #{email} AND password = #{pw}
+		]]>
+	</select>
+	
+	<!-- 모든 도시정보 -->
+	<select id="allCity" resultType="com.wayble.dto.CityDto">
+		<![CDATA[
+			SELECT  *
+			FROM	city
+		]]>
+	</select>
+	
+	<!-- 해당 시티인덱스의 모든 정보 가져오기 -->
+	<select id="showCity" resultType="com.wayble.dto.CityDto" parameterType="int">
+		<![CDATA[
+			SELECT	*
+	   		FROM	city
+	   		WHERE 	city_idx cityIdx = #{cityIdx}		
+		]]>
+	</select>
+	
+	<!-- 이메일로 유저정보 가쟈오기 -->
+	<select id="getUserByEmail" resultType="com.wayble.dto.UsersDto" parameterType="String">
+		<![CDATA[
+			SELECT	user_idx AS userIdx, email, nickname,
+					password, profile
+			FROM	users
+			WHERE	email = #{email}
+		]]>
+	</select>
+	
+	<!-- 유저인덱스로 유저 정보 가져오기 -->
+	<select id="getUserByIdx" resultType="com.wayble.dto.UsersDto" parameterType="int">
+	    <![CDATA[
+		    SELECT 	*
+		    FROM 	users
+	    	WHERE	user_idx = #{userIdx}
+	    ]]>
+	</select>
+	
+	<!-- 플래너인덱스로 도시 정보가져오기 (플래너리뷰에서 사용) -->
+	<select id="cityinfoFromPlannerIdx" resultType="com.wayble.dto.CityDto">
+		<![CDATA[
+			SELECT c.city_idx cityIdx, p.planner_idx plannerIdx, c.country, c.name, c.description, c.pic, c.lat, c.lng, c.name_eng nameEng
+			FROM city c
+			LEFT OUTER JOIN planner p ON c.city_idx = p.city_idx
+			WHERE p.planner_idx = #{plannerIdx}
+		]]>
+	</select>
+	
+	<!-- 유저플레이스인덱스(선택된명소)로 명소정보 가져오기 -->
+	<select id="getPlaceDetail" resultType="com.wayble.dto.PlaceDto">
+		<![CDATA[
+			SELECT	p.place_idx placeIdx, p.city_idx cityIdx, p.name, p.pic, p.place_rate placeRate, p.lat, p.lng, p.place_review_count placeReviewCount
+			FROM	USER_PLACE u
+			INNER	JOIN 	PLACE p ON u.place_idx = p.place_idx
+			WHERE	user_place_idx = #{userPlaceIdx}
+		]]>
+	</select>
+	
+	<!-- 안 읽은 알림이 있나 없나 체크 -->
+	<select id="checkUnreadAlarm" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*)
+			FROM alarm
+			WHERE user_idx = #{userIdx} AND read_yn = 'N'
+		]]>
+	</select>
+	
+	<!-- 위도경도에 맞는 명소인덱스 가져오기 -->
+   <select id="checkPlaceByLoc" resultType="Integer">
+      <![CDATA[
+         SELECT place_idx 
+         FROM 	place 
+         WHERE 	lat = #{lat} AND lng = #{lng}
+      ]]>
+   </select>
+   
+      <!-- 명소 저장 -->
+   <insert id="savePlace" parameterType="com.wayble.dto.PlaceDto">
+      <selectKey keyProperty="placeIdx" resultType="int" order="BEFORE">
+         <![CDATA[
+            SELECT seq_place_idx.nextval FROM dual
+         ]]>
+      </selectKey>
+      <![CDATA[
+         INSERT INTO place(place_idx, city_idx, name, pic, lat, lng, place_rate, place_review_count) 
+         VALUES       (#{placeIdx}, #{cityIdx}, #{name}, #{pic, jdbcType=VARCHAR}, #{lat}, #{lng}, #{placeRate, jdbcType=DOUBLE}, #{placeReviewCount, jdbcType=DOUBLE})
+      ]]>
+   </insert>
+   
+   <!-- 유저플레이스 추가(선택된 명소 추가) -->
+   <insert id="saveUserPlace">
+      <![CDATA[
+      INSERT INTO   USER_PLACE (user_place_idx, day_idx, place_idx, save_idx) 
+      VALUES      (seq_user_place_idx.nextval, #{dayIdx}, #{placeIdx}, #{saveIdx})
+      ]]>
+   </insert>
+   
+</mapper>

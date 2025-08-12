@@ -1,0 +1,513 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+<link rel='stylesheet' href='${pageContext.request.contextPath}/resources/css/planner.css'/>
+<link rel='stylesheet' href='${pageContext.request.contextPath}/resources/css/planner-hotel.css'/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/preloader.css"> <!-- loading_bar -->
+<script src="${pageContext.request.contextPath}/resources/js/jquery.preloader.min.js"></script> <!-- loading_bar -->
+
+<script>
+	let plannerIdx = `${param.plannerIdx}`;
+	let cityIdx = Number(`${param.cityIdx}`);
+	let curSearch = "";  // 검색란 입력한 문자열
+	let curHotelSearch = "";
+	let g_lasttime_requested;
+	let map;
+	let markers = [];
+	let date = ${setting.travelDate};
+	let ping = [];
+	for(let i=1; i<=10; i++){
+		let src = `${pageContext.request.contextPath}/resources/img/icon_number\${i}.png`;
+		ping.push(src);
+	}
+	let g_stopScroll = false;
+	
+	$(function() {
+		searchPlaceList(""); 
+		
+		// 여행 날짜를 선택하지 않고 명소를 등록하려 할 경우
+		$(document).on("click", "input[name='place']", function() {
+			if(!$('input[name="day"]').is(':checked')){
+				alert('여행 일차를 선택해 주세요');
+				$(this).prop('checked', false);
+				return;
+			}
+			if($(this).is(':checked')){
+				addStore($(this));
+				addMarker($(this));
+				reorder();
+			} else {
+				deleteStore($(this));
+				deleteMarker("store", $(this));
+				reorder();
+			}
+		})
+		
+		// sort
+		$(".order-btn").click(function() {
+			let order_type = $(this).text();  //'리뷰많은순' 또는 '별점순' 
+			if(order_type=='리뷰많은순') {
+				order_by_review();
+			} else if(order_type='별점순') {
+				order_by_star();
+			}
+		});
+		
+		$(document).on('click', '.bin', function() {
+			$(this).parent().parent().parent().remove();
+			undoSelect($(this));
+			deleteMarker("bin", $(this));
+			reorder();
+		});
+		
+		$("#con2 > input[type='text']").keypress(function(e) {
+			if(e.key === "Enter") {
+				let search = $(this).val();
+				searchPlaceList(search);
+			}
+		});
+		
+		$("#con2 > input[type='image']").click(function() {
+			let search = $(this).prev().val();
+			searchPlaceList(search);
+		});
+		
+		$("#con4").scroll(function(e){
+			if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+				console.log("badak!");
+				let search = $("#con2 > input[type='text']").val();
+				searchPlaceList(search);
+			}
+		});
+		
+		$("#make-planner-next").click(function() {
+			$(".selected-store-list").find(".day-block").each(function(idx, item) {
+				let dayIdx = $(item).attr("data-day-idx");
+				saveSelectedPlace(dayIdx);
+			})
+		});
+		
+		/* HotelSearch*************************************************************************************************/
+		// 팝업 여닫기
+		$('#hotel').click(function() {
+			$("#planner-hotel").css("display", 'block'); 
+			$('#bg-screen').css('display', 'inline');
+			$("#bg-screen").click(function() {
+				$("#planner-hotel").css("display", 'none');
+				$('#bg-screen').css('display', 'none');
+				$(".search-result").empty();
+				$("#planner-hotel").attr("data-token", "");
+			});
+		});
+		
+		// 호텔검색결과 무한스크롤
+		$(".search-result").scroll(function(e){
+			if(g_stopScroll) return;
+			if($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight - 5) {
+				console.log("badak!");
+				let search = $("#hotel-input").val();
+				searchHotelList(search);
+			}
+		});
+		
+		// 호텔 검색
+		$("#hotel-input").keypress(function(e) {
+			if(e.key == "Enter"){
+				let search = $("#hotel-input").val();
+				searchHotelList(search);
+			}
+		});
+		$(".search_icon").click(function() {
+			let search = $("#hotel-input").val();
+			searchHotelList(search);
+		});
+		
+		// 호텔 상세보기
+		$(document).on("click", ".hotel-box", function() {
+			g_stopScroll = true;
+	 		$(".search-result").empty();
+			let lat = $(this).attr("data-lat");
+			let lng = $(this).attr("data-lng");
+			let name = $(this).find(".hotel-name").text();
+			let address = $(this).find(".hotel-address").text();
+			
+			let str = `	<div id="hotel-map"></div>
+						<div class="hotel-info" data-lat="\${lat}" data-lng="\${lng}">
+							<div class="hotel-info-name">\${name}</div>
+							<span>주소</span>
+							<span class="hotel-info-address">\${address}</span>
+							<button class="add-hotel">추가하기</button>
+						</div>`;
+			$(".search-result").html(str);
+			showHotelMap(lat, lng);
+			$("#hotel-input").keypress(function(e) {
+				if(e.key == "Enter"){
+					return;
+				}
+			});
+			$(".search_icon").click(function() {
+				return;
+			});
+			// 호텔 정보 저장
+			$(document).on("click", ".add-hotel", function() {
+				saveHotel($(this));
+			});
+		});
+	});
+	
+	function addStore(invoke) { 
+		let day = $('input[name="day"]:checked').val();
+		$('.day-title').each(function(idx, item) {
+			if($(item).text() == day) {
+				let name = invoke.parent().parent().prev().find(".storeName").text();
+				let img = invoke.parent().parent().prev().prev().find("img").attr("src");
+				let lat = invoke.parent().parent().parent().attr("data-lat");
+				let lng = invoke.parent().parent().parent().attr("data-lng");
+				let rate = invoke.closest(".store").find(".place-rate").text();
+				let review = invoke.closest(".store").find(".place-review").text();
+				$(item).parent().append(`<div class="selected-store flex" data-lat="\${lat}" data-lng="\${lng}" data-rate="\${rate}" data-review="\${review}">
+											<div><b>0</b></div>
+											<div class="flex">
+												<div class="fit"><img src="\${img}"/></div>
+												<div class="selected-store-name">\${name}</div>
+												<div class="fit">
+													<button type='button' class='bin'>
+														<img src="${pageContext.request.contextPath}/resources/img/icon_bin.png"/>
+													</button>
+												</div>
+											</div>
+										</div>`);
+			}
+		})
+	};
+		
+	function deleteStore(invoke) {
+		let day = $('input[name="day"]:checked').val();
+		let storeName = invoke.parent().parent().prev().find(".storeName").text();
+		$('.selected-store-name').each(function(idx, item) {
+			if($(item).text() == storeName) {
+				$(item).parent().parent().remove();
+			}
+		})
+		deleteMarker(invoke);
+	};
+		
+	function reorder() {
+		$('.day-block').each(function(idx, item) {
+			let number = 1;
+			$(item).find('.selected-store').each(function() {
+				$(this).children().first().text(number++);
+			})
+		});
+	};
+	
+	function placeMap() {
+		let cityLat = Number($("#map").attr("data-lat"));
+		let cityLng = Number($("#map").attr("data-lng"));
+		const center = { lat: cityLat, lng: cityLng };
+		map = new google.maps.Map(document.getElementById("map"), {
+	        zoom: 11,
+	        center: center,
+	    });
+	};
+	
+	function addMarker(invoke) {
+		let lat = Number(invoke.closest(".store").attr("data-lat"));
+		let lng = Number(invoke.closest(".store").attr("data-lng"));
+		let day;
+		$('input[name="day"]').each(function(idx, item) {
+			if($(item).is(':checked')) {
+				day = $(item).attr("id");
+			}
+		})
+		let index = Number(day.replace("day", ""));
+		let src = ping[index - 1];
+		var placeLoc = new google.maps.LatLng(lat, lng);
+		var marker = new google.maps.Marker({
+	            position: placeLoc,
+	            icon: new google.maps.MarkerImage(src, null, null, null, new google.maps.Size(40, 40))
+        });
+		markers.push(marker);
+		var newLat = Number(map.getCenter().lat()) + lat;
+		var newLng = Number(map.getCenter().lng()) + lng;
+		var newLoc = new google.maps.LatLng(newLat / 2, newLng / 2);
+		map.setCenter(newLoc);
+		marker.setMap(map);
+	}
+	
+	function deleteMarker(from, invoke) {
+		let lat;
+		let lng;
+		if(from == "store"){
+			lat = Number(invoke.closest(".store").attr("data-lat"));
+			lng = Number(invoke.closest(".store").attr("data-lng"));
+		} else if (from == "bin"){
+			lat = Number(invoke.closest(".selected-store").attr("data-lat"));
+			lng = Number(invoke.closest(".selected-store").attr("data-lng"));
+		}
+		
+		markers = markers.filter(m => {
+			if(m.getPosition().lat() == lat && m.getPosition().lng() == lng){
+				m.setMap(null);
+				return false;
+			}
+			return true;
+		});
+	}
+	
+	function searchPlaceList(search) {
+		if(g_lasttime_requested!=undefined && g_lasttime_requested+3000 > new Date().getTime()) {
+			return;
+		}
+		let token = $("#con4").attr("data-token");
+		if(!(curSearch == search)) {
+			token = "";
+		}
+		const json_data = {
+				cityIdx : cityIdx,
+				search : search,
+				token : token
+		};
+		const init = {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(json_data)
+		};
+		$("#content").preloader();
+		fetch("placeList", init)
+		.then(response => response.json())
+		.then(data => {
+			$("#content").preloader('remove');
+			g_lasttime_requested = new Date().getTime();
+			$("#con4").attr("data-token", data.token);
+			if(!(curSearch == search)) {
+				$("#con4").empty();
+				$("#con4").scrollTop(0);
+			}
+			for(let i=0; i<data.list.length; i++){
+				let str = 	`<div class="store" data-lat="\${data.list[i].lat}" data-lng="\${data.list[i].lng}">
+								<div><img src="\${data.list[i].pic}"/></div>
+								<div>
+									<div class="storeName">\${data.list[i].store}</div>
+									<div class="flex fit">
+										<img src="${pageContext.request.contextPath}/resources/img/icon_review.png"/><span class="place-review">\${data.list[i].review}</span>
+										<img src="${pageContext.request.contextPath}/resources/img/icon_star.png"/><span class="place-rate">\${data.list[i].rate}</span>
+									</div>
+								</div>
+								<div>
+									<label>
+										<input type="checkbox" name="place" style="display:none;"/>
+										<img src="https://www.myro.co.kr/assets/images/none_select.svg" class="unchecked"/>
+										<img src="https://www.myro.co.kr/assets/images/place_select.svg" class="checked"/>
+									</label>
+								</div>
+							</div>`;
+				$("#con4").append(str);
+			}
+			order_by_review_or_star();   // 정렬방법에 따라.
+			curSearch = search;
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+		
+	}
+
+	function order_by_review() {
+		$("#con4").html(
+				$("#con4 .store").sort(function(a,b) {
+					let a_num = Number($(a).find('img[src="${pageContext.request.contextPath}/resources/img/icon_review.png"]').next().text());
+					let b_num = Number($(b).find('img[src="${pageContext.request.contextPath}/resources/img/icon_review.png"]').next().text());
+				return b_num - a_num;   // 오-왼 ==> 내림차순.
+			}) 
+		);
+	}
+	
+	function order_by_star() {
+		$("#con4").html(
+				$("#con4 .store").sort(function(a,b) {
+					let a_num = Number($(a).find('img[src="${pageContext.request.contextPath}/resources/img/icon_star.png"]').next().text());
+					let b_num = Number($(b).find('img[src="${pageContext.request.contextPath}/resources/img/icon_star.png"]').next().text());
+				return b_num - a_num;   // 오-왼 ==> 내림차순.
+			}) 
+		);
+	}
+	
+	function order_by_review_or_star() {
+		let star = $('input:radio[id=별점순]').is(':checked');
+		let num = $('input:radio[id=리뷰순]').is(':checked');
+		if(num) {
+			order_by_review();
+		} else if(star) {
+			order_by_star();
+		}
+	}
+	
+	function undoSelect(invoke) {
+		let storeName = invoke.parent().prev().text();
+		$(".storeName").each(function(idx, item) {
+			if($(item).text() == storeName) {
+				$(item).closest(".store").find("input[type='checkbox']").prop("checked", false);
+			}
+		})
+	}
+	
+	function searchHotelList(search) {
+		if(g_lasttime_requested!=undefined && g_lasttime_requested+3000 > new Date().getTime()) {
+			return;
+		}
+		let token = $("#planner-hotel").attr("data-token");
+		search = search == "" ? "호텔" : search;
+		const json_data = {
+				cityIdx : cityIdx,
+				search : search,
+				token : token
+		};
+		const init = {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(json_data)
+		};
+		$("#planner-hotel").preloader();
+		
+		fetch("placeList", init)
+		.then(response => response.json())
+		.then(data => {
+			$("#planner-hotel").preloader('remove');
+			g_lasttime_requested = new Date().getTime();
+			console.log(data);
+			$("#planner-hotel").attr("data-token", data.token);
+			if(!(curHotelSearch == search)) {
+				$(".search-result").empty();
+				$("#planner-hotel").scrollTop(0);
+			}
+			let str;
+			for(let i=0; i<data.list.length; i++){
+				str = `	<button class="hotel-box" data-lat="\${data.list[i].lat}" data-lng="\${data.list[i].lng}">
+							<div class="hotel-name">\${data.list[i].store}</div>
+							<span>숙소</span>
+							<span class="hotel-address">\${data.list[i].address}</span>
+						</button>`;
+				$(".search-result").append(str);
+			}
+			curHotelSearch = search;
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+	}
+	
+	function showHotelMap(lat, lng) {
+		lat = Number(lat);
+		lng = Number(lng);
+	    const center = { lat: lat, lng: lng };
+	    const map = new google.maps.Map(document.getElementById("hotel-map"), {
+	        zoom: 15,
+	        center: center,
+	    });
+	    
+        var marker = new google.maps.Marker({
+            map: map,
+            position: new google.maps.LatLng(lat, lng),
+        });
+	}
+	
+	function saveSelectedPlace(dayIdx) { 
+		let placeList = [];
+		$(`.day-block[data-day-idx="\${dayIdx}"]`).find(".selected-store").each(function(idx, item){
+			let place = {
+				cityIdx : cityIdx,
+				name : $(item).find(".selected-store-name").text(), 
+				pic : $(item).find("img").attr("src"),
+				lat : $(item).attr("data-lat"),
+				lng : $(item).attr("data-lng"),
+				rate : $(item).attr("data-rate"),
+				review : $(item).attr("data-review"),
+			}
+			placeList.push(place);
+		})
+		const json_data1 = { 
+			placeList : placeList,
+			target : "store",
+		};
+		const init1 = {
+			method: "post",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(json_data1)
+		};
+		fetch("checkPlace", init1)
+		.then(response => response.json())
+		.then(data => {
+			console.log(data);
+			const json_data2 = {
+				dayIdx : dayIdx,
+				placeIdx : data,
+				target : "store", 
+			};
+			const init2 = {
+				method: "post",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(json_data2)
+			}
+			return fetch("saveUserPlace", init2)
+		})
+		.then(response => {
+			alert("저장 성공!");
+			location.href="planner/update?plannerIdx=" + plannerIdx;
+		})
+		.catch(error => {
+			//alert("에러! : " + error);
+		});
+	}
+	
+	function saveHotel(invoke) {
+		let name = invoke.prev().prev().prev().text();
+		let lat = Number(invoke.parent().attr("data-lat"));
+		let lng = Number(invoke.parent().attr("data-lng"));
+		const json_data1 = {
+			cityIdx : cityIdx,
+			hotel : name,
+			lat : lat,
+			lng : lng,
+			target : "hotel",
+		}
+		const init1 = {
+			method: "post",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(json_data1)
+		};
+		fetch("checkPlace", init1)
+		.then(response => response.json())
+		.then(data => {
+			let firstDayIdx = $(".selected-store-list > div:nth-child(1)").attr("data-day-idx");
+			const json_data2 = {
+				firstDayIdx : firstDayIdx,
+				travelDate : date,
+				placeIdx : data,
+				target : "hotel",
+			};
+			const init2 = {
+				method: "post",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify(json_data2)
+			}
+			return fetch("saveUserPlace", init2)
+		})
+		.then(response => {
+			alert("저장 성공!");
+		})
+		.catch(error => {
+			//alert("에러! : " + error);
+		});
+	}
+	
+	
+
+		
+</script>
+<script async
+src="https://maps.googleapis.com/maps/api/js?key=<%=CommonKey.googleKey %>&callback=placeMap&loading=async">
+</script>
+	

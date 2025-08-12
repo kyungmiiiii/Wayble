@@ -1,0 +1,223 @@
+@charset "UTF-8";
+
+	#add-post-main {  /* 게시글 팝업창 */
+		border: 2px solid #C0C0C0;
+		border-radius: 30px;
+	    width: 1300px;
+	    height: 800px;
+	    margin: 70px auto;
+	    box-sizing: border-box;
+	    padding: 40px;
+	    position: absolute;
+	    background-color: white;
+	    z-index: 10;
+	    display: none;
+       	top: 70px;
+    	right: 0;
+    	left: 0;
+	}
+	#add-post-one {
+		display: flex;
+	    align-items: center;
+	    gap: 15px;
+	}
+	#add-post-one div {  /* 게시글 작성하기 */
+		font-size: 30px;
+		font-weight: bold;
+		margin-bottom: 20px;
+	}
+	.add-post-x {
+		width: 30px;
+		height: 30px;
+	    margin-left: 970px;
+    	margin-top: -40px;
+    	cursor: pointer;
+	}
+	#add-post-two {
+		display: flex;
+	    flex-direction: column;
+	    gap: 15px;
+	    width: 1220px;
+	    height: 280px;
+	    margin-left: 30px;
+	}
+	#add-post-two div {  /* 사진 업로드 */
+		font-size: 28px;
+		font-weight: bold;
+		padding: 15px;
+	}
+	#add-post-two > div:nth-child(1) {
+		margin-bottom: 10px;
+	}
+	.add-post-box {
+		display: flex;
+	    flex-direction: row;
+	    width: 1170px;
+	}
+	.add-post-empty-box {
+		width: 160px;
+		height: 137px;
+	}
+	.add-post-empty {  /* 사진 추가 위치 */
+		width: 160px;
+		height: 135px;
+		margin-right: 15px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 10px;
+	}
+	.add-post-empty .camera {
+	    top: 210px;
+   		position: absolute;		
+		width: 50px;
+		height: 50px;
+		margin-bottom: 10px;
+	}
+	.add-post-empty div {
+		font-size: 15px;
+		display: flex;
+		align-items:center;
+	}
+	.camera {
+		width: 70px;
+		height: 70px;
+		margin-top: -8px;
+		margin-left: -5px;
+	}
+	.post-images {
+		display: flex;
+	    flex-direction: row;
+		overflow-x: scroll;
+		overflow-y: hidden;
+		width: 985px;
+		height: 155px;
+	}
+	.post-images img {
+		width: 150px;
+		height: 140px;
+		object-fit: cover;
+		margin-right: 15px;
+		border-radius: 3px;
+	}
+	#add-post-three {
+		position: relative;
+		display: flex;
+	    flex-direction: column;
+	    gap: 15px;
+	    width: 1180px;
+	    height: 230px;
+	    margin-left: 30px;
+	}
+	.add-post-title > span:nth-child(1) {  /* 문구 추가 */
+		font-size: 28px;
+		font-weight: bold;
+	}
+	.add-post-title > span:nth-child(2) {  /* (선택) */
+		font-size: 15px;
+	}
+	.add-post-text-box {
+		position: relative;
+		height: 215px;
+		border: 2px solid #C0C0C0;
+		box-sizing: border-box;
+		overflow: hidden;
+	}
+	.add-post-text-detail {
+		width: 100%;
+		height: 100%;
+		resize: none;
+		font-size: 15px;
+		padding: 10px;
+		border: none;
+		box-sizing: border-box;
+	}
+	.add-post-count {  /* 0/1000 */
+		position: absolute;
+		align-self: flex-end;
+		bottom: 25px;
+		color: #666;
+		font-size: 15px;
+		margin-right: 20px;
+	}
+	#add-post-three div {
+		font-size: 28px;
+		font-weight: bold;
+	}
+	.add-post-btn-box {  /* 전체공개, 나만보기, 내팔로워, 글등록하기 버튼 위치 */
+		display: flex;
+	    flex-direction: row;
+	}
+	.add-post-open-btn { /* 전체공개, 나만보기, 내팔로워 버튼 */
+		display: flex;
+		justify-content: flex-end;
+		gap: 10px;
+		margin-right: 740px;
+	}
+	.open-range {
+	    width: 90px;
+	    height: 30px;
+	    padding: 5px;
+	    border-radius: 10px;
+	    font-size: 16px;
+		font-weight: bold;		    
+	    border: 2px solid #C0C0C0;
+	    background-color: white;
+	    
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	}
+	.open-range:hover {
+		background-color: #F2F2F2;
+	}
+	input[type="radio"]:checked + .btn-submit {
+		border: 2px solid #E0E0E0;
+		background-color: #E0E0E0;
+		font-weight: bold;
+	}
+	.add-post-close-btn {  /* 글등록하기 버튼 */
+		display: flex;
+		justify-content: flex-end;
+		margin-right: 10px;
+		width: 140px;
+		height: 48px;
+	}
+	.add-post-submit {
+		width: 290px;
+	    height: 40px;
+	    padding: 5px;
+	    border-radius: 10px;
+	    font-size: 15px;
+		font-weight: bold;		    
+	    border: 2px solid #C0C0C0;
+	    background-color: white;
+	}
+	.add-post-submit:hover {
+		background-color: #C0C0C0;
+	}
+	.add-post-empty-box > div > input{
+	  	position: absolute; 
+	  	top: 0; 
+	  	left: 0;
+        width: 100%; 
+        height: 100%;
+        opacity: 0; 
+        cursor: pointer;
+	}
+	.add-post-empty-box > div {
+		position: relative; 
+		width: 100px; 
+		height: 100px;
+	}
+	#add-post-four > div:nth-child(1){
+		font-size: 28px;
+		font-weight: bold;	
+		margin-bottom: 20px;
+	}
+	#add-post-four {
+		padding: 30px;
+		
+	}
+

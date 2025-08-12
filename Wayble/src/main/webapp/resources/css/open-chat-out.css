@@ -1,0 +1,127 @@
+@charset "UTF-8";
+
+	#open-chat-out {  /* 오픈채팅방 설명 팝업창 */
+		border: 2px solid #C0C0C0;
+		border-radius: 30px;
+	    width: 530px;
+	    height: 750px;
+	    display: none;
+	    z-index: 20;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background-color: white;
+	}
+	#chat-out-one {
+		display: flex;
+		flex-direction: column;
+		width: 425px;
+		height: 45px;
+		margin-top: 30px;
+		margin-left: 40px;
+	}
+	.font {  /* 오픈채팅 제목 글자 */
+		font-size: 20px;
+		font-weight: bold;
+	}
+	.chat-out-x {
+		margin: -55px 0 0 420px;
+	}
+	.open-chat-out-x {  /* 버튼 */
+		width: 40px;
+	  	height: 40px;
+	  	padding: 5px;
+	  	font-size: 18px;
+	  	font-weight: bold;
+	  	background-color: white;
+	    border: none;
+	    border-radius: 20px;
+	    cursor: pointer;
+	}
+	.open-chat-out-x:hover {
+		background-color: white;
+	}
+	.close {
+		width: 25px;
+		height: 25px;
+		margin-top: -3px;
+	}
+	.chat-out-text-box {
+		display: flex;
+	    flex-direction: row;
+		border: 2px solid #C0C0C0;
+		width: 466px;
+		height: 175px;
+		border-radius: 15px;
+		margin-top: 10px;
+	}
+	.text {
+		font-size: 15px;
+		color: gray;
+		margin-left: 10px;
+		margin-top: 10px;
+	}
+	#chat-out-two {
+		width: 470px;
+		height: 245px;
+		margin-left: 25px;
+	}
+	.chat-content {
+		font-size: 20px;
+		font-weight: bold;
+		margin-left: 5px;
+	}
+	#chat-out-three {
+		width: 470px;
+		height: 350px;
+		margin-left: 20px;
+	}
+	.member {  /* 참여 맴버 글자 */
+		font-size: 20px;
+		font-weight: bold;
+		margin-left: 5px;
+	}
+	.chat-out-profile-list {
+		overflow-x: hidden;
+		overflow-y: scroll;
+		width:470px;
+		height: 330px;
+	}
+	.profile_box {
+		width: 130px;
+		height: 70px;
+		margin-left: 10px;
+		margin-top: 5px;
+		margin-bottom: -15px;
+		display: flex;
+	    align-items: center;
+	    gap: 5px;
+	}
+	.profile {
+		width: 50px;
+		height: 50px;
+	}
+	.nickname {
+		font-size: 20px;
+	}
+	#chat-out-four {
+		display: flex;
+		align-content: center;
+		justify-content: center;
+		width: 510px;
+		height: 70px;
+	}
+	.chat-out-button {
+		width: 475px;
+	    height: 50px;
+	    padding: 5px;
+	    font-size: 20px;
+	    border-radius: 15px;
+	    border: 2px solid #C0C0C0;
+	    background-color: white;
+	    color: red;
+	}
+	.chat-out-button:hover {
+		background-color: gray;
+	}

@@ -1,0 +1,135 @@
+@charset "UTF-8";
+	* { box-sizing: border-box; }
+	.border { border: 1px solid red; }
+	.center { margin: 0 auto; }
+	#chat-log {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 530px;
+		height: 750px;
+		transform: translate(-50%, -50%);
+		border-radius: 30px;
+		border: 2px solid #8080805e;
+		display: none;
+		z-index: 20;
+		background-color: white;
+	}
+	#chat-log-header {
+		object-fit: cover;
+		margin: 30px 20px 30px 30px;
+		position: relative;
+	}
+	#chat-log-header > span {
+		font-size: 30px;
+	}
+	#chat-log-x {
+		width: 40px;
+		height: 40px;
+		position: absolute;
+		right: 10px;
+		border: none;
+		background-color: white;
+	}
+	#chat-log-x > img {
+		width: 30px;
+		height: 30px;
+	}
+	#chat-log-content {
+		width: 525px;
+		height: 580px;
+		overflow-x: hidden;
+		overflow-y: scroll;
+	}
+	.chat-log-start {
+		margin: 20px 0px 0px 20px;
+		width: 330px;
+		height: 50px;
+		display: flex;
+		object-fit: cover;
+	}
+	.chat-log-start > div:nth-child(1) {
+	    margin-right: 5px;
+	}
+	.chat-log-start > div:nth-child(1) > img {
+		width: 40px;
+		height: 40px;
+		border-radius: 50%;
+	}
+	.chat-log-start > div:nth-child(2) > div:nth-child(1) {
+		margin-top: 3px;
+	}
+	.chat-log-start > div:nth-child(2) > div:nth-child(2) {
+		background-color: rgb(235, 235, 235);
+		border-radius: 20px;
+		font-size: 15px;
+		padding: 5px 10px;
+	}
+	.chat-log-left {
+		display: inline-block;
+		background-color: rgb(235, 235, 235);
+		border-radius: 20px;
+		font-size: 15px;
+		padding: 5px 10px;
+		margin: 15px 0px 0px 65px;
+		max-width: 330px;
+	}
+	.chat-log-right {
+		 text-align:right;
+	}
+	.chat-log-right > div {
+		display: inline-block; 
+		background-color: rgb(235, 235, 235);
+		border-radius: 20px;
+		font-size: 15px;
+		padding: 5px 10px;
+		max-width: 330px;
+		margin: 10px 30px 5px 0px;
+	}
+	#chat-log-send {
+		width: 490px;
+		height: 45px;
+		margin-top: 15px;
+		object-fit: cover;
+		display: flex;
+	}
+		
+	#chat-log-send > input[type='text'] {
+		width: 450px;
+		height: 40px;
+		border-radius: 20px;
+		border: 2px solid rgb(235, 235, 235);
+		font-size: 15px;
+		padding: 15px;
+		outline: none;
+	}
+	
+	#chat-log-send > input[type='image'] {
+	    position: absolute;
+	    right: 15px;
+	    width: 35px;
+		margin: 2px 0 0 5px; 
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

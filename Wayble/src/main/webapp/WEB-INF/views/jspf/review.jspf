@@ -1,0 +1,257 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.ArrayList"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/review.css" />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+<% String googleKey = "AIzaSyBO292cTbolXbrl7Q_mRicCmyHObBb-AUA"; %>
+<script async
+	src="https://maps.googleapis.com/maps/api/js?key=<%=googleKey%>&callback=initMap&loading=async">
+</script>
+
+<script>
+	let str = "";
+	let plannerIdx = ${plannerIdx};
+	let cityLat = ${cDto.lat};
+	let cityLng = ${cDto.lng};
+	let map;
+	let myMarkers = [];
+	let travleDate;
+	let placeLoc = [];
+	let myLines = [];
+	
+	function initMap() {
+	    const map = new google.maps.Map(document.getElementById("map"), {
+	        center: { lat: ${cDto.lat}, lng: ${cDto.lng} },
+	        zoom: 10
+	    });
+	}
+	
+	$(function() {
+		// 기본 세팅
+		$(".city-name").text("${pIDto.country} ${pIDto.city}");
+		$(".title").text("${pIDto.title}");
+		loadUserPlace(1);
+		
+		// 날짜 선택대로 명소 띄우기
+		$("select[name='day']").change(function() {
+			let date = Number($(this).val().replace("day", ""));
+			loadUserPlace(date);
+			changeActiveDate($(this).val());
+		})
+		
+		//명소 눌렀을 때 상세보기
+		$(document).on("click", ".click_map_schedule_div", function() {
+			showPlaceDetail($(this));
+		})
+		
+		
+		// 별점 표시
+		$(".star").click(function() {
+			$(".star").addClass("clicked");
+		});
+		
+		$(".click-regist").click(function(){
+			//alert('눌림!');
+			const json_data = {
+				content : $("textarea").val(),
+				plannerIdx : plannerIdx,
+				userIdx : ${loginUserIdx},
+				rate : $('input[name="rating"]:checked').val()
+			};
+			const init01 = {
+				method: "POST",
+				headers: {
+					/* "Content-Type": "application-json" */
+				},
+				body: JSON.stringify(json_data)
+			};
+			
+			fetch('wirteReviewComment', init01)
+			.then(function(response) {
+				return response.json()
+			})
+			.then(function(data) {
+				console.log(data);	//자바스크립트 안에 EL문법쓰려면 앞에 역슬래시 붙여서쓰기!
+					let str = `
+								<div class="article">
+									<div class="article_header">
+										<img src="https://image.hanatour.com/usr/static/img2/pc/com/rating_star_on.png"/>
+										<span>\${data.data.rate}</span>
+										<img src="${pageContext.request.contextPath}/wayble_upload/\${data.data.profile}"/>
+										<span>\${data.data.nickname}</span>
+									</div>
+									<div class="article_content">
+										<p>\${data.data.content}</p>
+									</div>
+								</div>
+							`;
+							alert('댓글이 등록되었습니다.');
+					$("#review-list").prepend(str);
+					
+					$("textarea").val('');
+			        $('input[name="rating"]').prop('checked', false);
+			})
+			.catch(function(error) {
+				alert("에러! : " + error);
+			});
+		})
+		
+	});
+	
+	
+	
+ 	function loadUserPlace(date) {
+ 		const json_data = {
+ 				plannerIdx: plannerIdx,
+ 				date: date,
+		};
+		const init = {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(json_data)
+		};
+		fetch("loadUserPlace", init)
+		.then(response => response.json())
+		.then(data => {
+			travelDate = data.travelDate;
+			console.log(data);
+			deleteAllMarker();
+			deleteAllLine();
+			$(".timeline").empty();
+			for(let i=0; i<data.list.length; i++) {
+				str = `	<div class="timeline_outer">
+							<div class="timeline_inner">
+								<div>
+									<div class="numbered circle_violet">\${i + 1}</div>
+									<div class="distance" style="display: \${i == data.list.length-1 ? 'none' : 'block'}">\${data.list[i].distance}km</div>
+								</div>
+								<div>
+									<h3 data-place-idx="\${data.list[i].placeIdx}" data-user-place-idx="\${data.list[i].userPlaceIdx}">\${data.list[i].name}</h3>
+									<input type="submit" class="click_map_schedule_div"/>
+								</div>
+							</div>
+						</div>`;
+				$(".timeline").append(str);
+				addMarker(data.list[i].lat, data.list[i].lng, date);
+				placeLoc.push({lat : data.list[i].lat, lng : data.list[i].lng});
+				drawPath();
+			}
+			if($("select[name='day'] option").length == 0){
+				for(let i=1; i<=data.travelDate; i++){
+					str = `<option value="day\${i}">day\${i}</option>`;
+					$("select[name='day']").append(str);
+					str = `<li>day\${i}</li>`;
+					$("#float_div ul").append(str);
+				}
+			}
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});	
+ 	}
+
+ 	function showPlaceDetail(invoke) {
+ 		let userPlaceIdx = invoke.prev().attr("data-user-place-idx");
+ 		const json_data = {
+ 				userPlaceIdx: userPlaceIdx,
+		};
+		const init = {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json"
+				},
+				body: JSON.stringify(json_data)
+		};
+		fetch("getUserPlaceDetail", init)
+		.then(response => response.json())
+		.then(data => {
+			$(".place-detail").empty();
+			let yellow = Math.round(data.placeRate);
+			let grey = 5 - yellow;
+			let star = "";
+			for(let i=1; i<=yellow; i++) star += `<span class="small_star_yellow"></span>`;
+			for(let i=1; i<=grey; i++) star += `<span class="small_star_grey"></span>`;
+			str = `	<div>
+						<img src="\${data.pic}"/>
+					</div>
+					<div>
+						<h3>\${data.name}</h3>
+						<div class="place-rate">` + 
+							star + 
+							`<span>\${data.placeReviewCount}</span>
+						</div>
+					</div>`;
+			$(".place-detail").append(str);
+			moveMapCenter(data.lat, data.lng);
+		})
+		.catch(error => {
+			alert("에러! : " + error);
+		});
+ 	}
+ 	
+	function userPlaceMap() {
+		const center = { lat: cityLat, lng: cityLng };
+		map = new google.maps.Map(document.getElementById("map"), {
+	        zoom: 12,
+	        center: center,
+	    });
+	}
+	
+	function addMarker(lat, lng, date) {
+		let src = `img/icon_number\${date}.png`;
+		console.log(lat +"/"+ lng);
+		var placeLoc = new google.maps.LatLng(lat, lng);
+		var marker = new google.maps.Marker({
+	            position: placeLoc,
+	            map: map,
+	            icon: new google.maps.MarkerImage(src, null, null, null, new google.maps.Size(40, 40)),
+        });
+		myMarkers.push(marker);
+		marker.setMap(map);
+	}
+	
+	function deleteAllMarker() {
+		placeLoc = [];
+		for(let i=0; i<myMarkers.length; i++){
+			myMarkers[i].setMap(null);
+		}
+	}
+	
+	function deleteAllLine() {
+		for(let i=0; i<myLines.length; i++){
+			myLines[i].setMap(null);
+		}
+	}
+	
+	function moveMapCenter(lat, lng){
+		var newLoc = new google.maps.LatLng(lat, lng);
+		map.setCenter(newLoc);
+	}
+	
+	function changeActiveDate(day) {
+		$("#float_div ul li").each(function(idx, item) {
+			if(day == $(item).text()) $(item).addClass("active");
+			else $(item).removeClass();
+		})
+	}
+
+	function drawPath() {
+	    const drawPath = new google.maps.Polyline({
+	        path: placeLoc,
+	        geodesic: true,
+	        strokeColor: "#FF0000",
+	        strokeOpacity: 1.0,
+	        strokeWeight: 4,
+	    });
+	    myLines.push(drawPath);
+	    drawPath.setMap(map);
+	}
+</script>
+

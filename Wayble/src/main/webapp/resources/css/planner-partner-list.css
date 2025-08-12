@@ -1,0 +1,93 @@
+@charset "UTF-8";
+
+	#plannerPartner-main {  /* 동행인 내역보는 팝업창 */
+		border: 3px solid #C0C0C0;
+		border-radius: 25px;
+	    width: 330px;
+	    height: 400px;
+	    background-color: white;
+	    z-index: 10;
+		position: absolute;
+		top: 110px;
+		left: 1560px;
+		display: none;
+	}
+	.partner-window-close {  /* 버튼 */
+		width: 50px;
+   		height: 50px;
+   		padding: 5px;
+   		font-size: 18px;
+   		font-weight: bold;
+   		background-color: white;
+	    border: none;
+	    border-radius: 20px;
+	    cursor: pointer;
+	    margin-left: 260px;
+	    margin-top: 10px;
+	}
+	.partner-window-close:hover {
+		background-color: white;
+	}
+	.close {
+		width: 25px;
+		height: 25px;
+	}
+	#partner-Profile-list {
+		display: flex;
+		flex-direction: column;
+		width: 310px;
+		height: 310px;
+		margin-left: 5px;
+		margin-top: -5px;
+		overflow-x: hidden;
+		overflow-y: scroll;
+	}
+	.partner-profile-box {  /* 방장 프로필 위치 */
+		display: flex;
+		align-items: center;		
+		width: 280px;
+		height: 90px;
+		margin-top: 15px;
+		margin-left: 10px;
+	}
+	.profile-king {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+	}
+	.king {
+		width: 30px;
+		height: 25px;
+		margin-left: 10px;
+	}
+	.partner-profile {
+		width: 60px;
+		height: 60px;
+		margin-left: 5px;
+	}
+	.nickname {
+		font-size: 20px;
+		margin-top: 10px;
+	}
+	.partner-profileList-box {  /* 동행인 프로필 위치 */
+		width: 280px;
+    	height: 70px;
+    	margin-left: 10px;
+    	margin-top: 5px;
+	    display: flex;
+    	align-items: center;
+    	gap: 5px;
+	}
+	.partner-delete-btn {
+	    width: 40px;
+	    height: 25px;
+	    font-size: 12px;
+	    font-weight: bold;
+	    border: 1px solid #C0C0C0;
+	    border-radius: 10px;
+	    background-color: white;
+	    margin-left: 20px;
+	}
+	.partner-delete-btn:hover {
+		background-color: #C0C0C0;
+	}

@@ -1,0 +1,171 @@
+@charset "UTF-8";
+
+	#open-chat-search {  /* 오픈채팅방 찾기 팝업창 */
+		border: 5px solid #C0C0C0;
+		border-radius: 70px;
+	    width: 530px;
+	    height: 800px;
+	    margin: 385px auto;
+	    box-sizing: border-box;
+	    display: flex;
+	    flex-direction: column;
+	    
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -100%);
+		background-color: white;
+		display: none;
+		z-index: 10;
+	}
+	#open-chat-one {
+		width: 490px;
+		height: 125px;
+		margin-top: 30px;
+		margin-left: 20px;
+		display: flex;
+		flex-direction: column;
+	}
+	#open-chat-title {
+		width: 490px;
+		height: 40px;
+		display: flex;
+		margin-bottom: 5px;
+	}
+	#open-chat-title > div {  /* 오픈채팅 찾기 글자 */
+		font-size: 28px;
+		font-weight: bold;
+	}
+	.img {  /* 엑스 이미지 */
+		width: 15px;
+		height: 15px;
+		margin-left: 430px;
+		margin-top: -40px;
+	}
+	.open-chat-search-x {  /* 버튼 */
+		width: 30px;
+  		height: 30px;
+	    margin-left: 275px;
+	    cursor: pointer;
+	}
+	.title {
+		font-size: 15px;
+		margin-top: 10px;
+		margin-left: 5px;	
+	}
+	#open-chat-search-bar {  /* 검색창 */
+		position: relative;
+		width: 250px;
+		margin-top: 5px;
+	}
+	#open-chat-search-bar > input {  /* 검색어를 입력해주세요 글자 */
+		width: 190%;
+		padding: 8px 40px 8px 12px;
+		border-radius: 6px;
+		font-size: 16px;
+		border: 2px solid #C0C0C0;
+		box-sizing: border-box;
+	}
+	#open-chat-search-bar > svg {  /* 돋보기 */
+		position: absolute;
+		left: 435px;
+		top: 28%;
+		transform: translateY(-50%);
+		width: 20px;
+		height: 20px;
+		fill: #888;
+		pointer-events: none;
+	}
+	.open-chat-search-icon {  /* 돋보기 버튼 */
+		position: absolute;
+		top: 30%;
+		left: 435px;
+		transform: translateY(-50%);
+		background: transparent;
+	    border: none;
+	    cursor: pointer;
+	    width: 30px;
+	}
+	.open-chat-search-icon:hover {
+		border: 1px solid white;
+		background-color: white;
+	}
+	#open-chat-search-two {
+		width: 470px;
+		height: 560px;
+		margin-left: 20px;
+		overflow-x : hidden;
+		overflow-y : scroll;
+	}
+	#check-box-red {
+		width: 468px;
+		height: 80px;
+		margin-bottom: 12px;
+  		padding: 5px;
+  		border-radius: 10px;
+  		background-color: rgb(255, 238, 247);
+	    border: none;
+	    cursor: pointer;
+	    text-align: left;
+	}
+	#check-box-green {
+		width: 468px;
+		height: 80px;
+		margin-bottom: 12px;
+  		padding: 5px;
+  		border-radius: 10px;
+  		background-color: rgb(202, 237, 207);
+	    border: none;
+	    cursor: pointer;
+	    text-align: left;
+	}
+	#check-box-yellow {
+		width: 468px;
+		height: 80px;
+		margin-bottom: 12px;
+  		padding: 5px;
+  		border-radius: 10px;
+  		background-color: rgb(255, 242, 209);
+	    border: none;
+	    cursor: pointer;
+	    text-align: left;
+	}
+	#check-box-red:hover {
+		border: 1px solid rgb(255, 238, 247);
+		background-color: rgb(255, 238, 247);
+	}
+	#check-box-green:hover {
+		border: 1px solid rgb(202, 237, 207);
+		background-color: rgb(202, 237, 207);
+	}
+	#check-box-yellow:hover {
+		border: 1px solid rgb(255, 242, 209);
+		background-color: rgb(255, 242, 209);
+	}
+	.chatRoom {  /* 채팅방 목록 */
+		padding: 4px 10px 5px 10px;
+		border-radius: 10px;
+		margin-bottom: 15px;
+	}
+	.chatRoom > div:nth-child(1) {
+		display: flex;
+		height: 35px;
+		font-size: 16px;
+	}
+	.chatRoom > div:nth-child(1) > div:nth-child(1) {  /* 채팅방 선택할 수 있는 컬러 박스 */
+		width: 25px;
+		height: 25px;
+		border-radius: 10px;
+		margin-top: 3px;
+	}
+	.chatRoom > div:nth-child(1) > div:nth-child(2) {
+		justify-content: center;
+		align-content: center;
+		margin-left: 5px;
+	}
+	.chatRoom > div:nth-child(2) {
+		font-size: 15px;
+	}
+	.open-chat-search-title {
+    	margin: 10px 0 0 5px;
+	}

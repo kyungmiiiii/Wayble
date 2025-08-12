@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlannerMapper">
+	<!-- 플래너 전체 리스트 -->
+	<select id="getPlannerDetailByIdx" resultType="com.wayble.dto.PlannerDetailDto" parameterType="int">
+		<![CDATA[
+			SELECT	p.planner_idx AS plannerIdx,
+					p.user_idx AS userIdx,
+					p.city_idx AS cityIdx, p.title,
+					p.start_date AS startDate,
+					p.end_date AS endDate,
+					p.complete_yn AS completeYN,
+					u.nickname, u.profile
+			FROM 	planner p
+			JOIN 	users u ON p.user_idx = u.user_idx
+			WHERE 	p.planner_idx = #{plannerIdx}	
+		]]>
+	</select>
+	
+	<!-- 도시 상세 보여주기 -->
+	<select id="getCityDetail" resultType="com.wayble.dto.CityDto" parameterType="int">
+		<![CDATA[
+			SELECT 	city_idx AS cityIdx, country, name, 
+					description, pic, lat, lng, name_Eng AS nameEng
+			FROM 	city
+			WHERE 	city_idx = #{cIdx}
+		]]>	
+	</select>
+	
+	<!-- 플래너별 일차 가져오기 -->
+	<select id="getDaysByPlannerIdx" resultType="com.wayble.dto.DayDto" parameterType="int">
+		<![CDATA[
+			SELECT		day_idx AS dayIdx, planner_idx AS plannerIdx
+			FROM		day
+			WHERE		planner_idx = #{plannerIdx}
+			ORDER BY	day_idx
+		]]>
+	</select>
+	
+	<!-- 일차별로 선택된 명소 띄워주기  -->
+	<select id="getPlacesByDayIdx" resultType="com.wayble.dto.UserPlaceNameDto" parameterType="int">
+		<![CDATA[
+			SELECT		p.name, p.place_idx AS placeIdx, 
+						u.user_place_idx AS userPlaceIdx, 
+						p.lat, p.lng
+			FROM		user_place u
+			INNER JOIN	place p ON p.place_idx = u.place_idx
+			WHERE		u.day_idx = #{dayIdx}
+			ORDER BY	u.save_idx
+		]]>
+	</select>
+	
+	<!-- 플래너 제목 수정 -->
+	<select id="updateTitle" resultType="com.wayble.dto.PlannerDto" parameterType="map">
+		<![CDATA[
+			UPDATE		planner
+			SET			title = #{title}
+			WHERE		planner_idx = #{plannerIdx}
+		]]>
+	</select>
+	
+	<!-- 동행인 리스트 -->
+	<select id="getPartnerInfoList" resultType="com.wayble.dto.PartnerInfoDto" parameterType="int">
+		<![CDATA[
+			SELECT 		planner_idx AS plannerIdx, nickname, profile, 
+						u.user_idx AS userIdx
+			FROM 		users u
+			INNER JOIN 	partner p ON u.user_idx = p.user_idx
+	       	WHERE 		p.planner_idx = #{plannerIdx}
+		]]>
+	</select>
+	
+	<!-- 동행인 삭제 -->
+	<delete id="deletePartner" parameterType="map">
+		<![CDATA[
+			DELETE
+			FROM		partner
+			WHERE		planner_idx = #{plannerIdx} AND user_idx = #{userIdx}
+		]]>
+	</delete>
+	
+	<!-- 동행인 추가 -->
+	<insert id="addPartner" parameterType="com.wayble.dto.PartnerDto">
+		<![CDATA[
+			INSERT 
+			INTO 		partner(planner_idx, user_idx, join, code)
+			VALUES 		(#{plannerIdx}, #{userIdx}, 0, #{code})
+		]]>
+	</insert>
+	
+	<!-- 동행인 초대 코드 -->
+	<update id="acceptPartner" parameterType="com.wayble.dto.PartnerDto">
+		<![CDATA[
+			UPDATE		partner
+			SET			join = 1
+			WHERE		code = #{code}
+		]]>
+	</update>
+	
+	<!-- 동행인 초대 코드 확인 -->
+	<select id="getPlannerIdxByCode" resultType="Integer">
+		<![CDATA[
+			SELECT 	planner_idx plannerIdx
+			FROM	partner
+			WHERE 	code = #{code}
+		]]>
+	</select>
+	
+	<!-- 명소별 작성된 메모 상세 보여주기 -->
+	<select id="getMemoDetailList" resultType="com.wayble.dto.MemoDto" parameterType="int">
+		<![CDATA[
+			SELECT    	m.user_place_idx AS userPlaceIdx,
+						m.user_idx AS userIdx, m.content, u.nickname
+            FROM    	memo m
+            JOIN 		users u ON m.user_idx = u.user_idx
+            WHERE    	m.user_place_idx = #{userPlaceIdx}
+		]]>
+	</select>
+	
+	<!-- 메모 존재 여부 확인 -->
+	<select id="memoExists" resultType="boolean">
+		<![CDATA[
+			SELECT CASE WHEN EXISTS (
+		      	   SELECT 1 FROM memo
+		      	   WHERE user_place_idx = #{userPlaceIdx}
+		      	   AND user_idx = #{userIdx}
+		    	   ) THEN 1 ELSE 0 END AS exists_flag
+		    FROM   dual	
+		]]>
+	</select>
+	
+	<!-- 메모 작성 -->
+	<insert id="insertMemo">
+		<![CDATA[
+			INSERT INTO memo(user_place_idx, user_idx, content)
+			VALUEs		(#{userPlaceIdx}, #{userIdx}, #{content})
+		]]>
+	</insert>
+	
+	<!-- 메모 수정 -->
+	<update id="updateMemo" parameterType="map">
+		<![CDATA[
+			UPDATE		memo
+			SET			content = #{content}, user_idx = #{userIdx}
+			WHERE		user_place_idx = #{userPlaceIdx}
+		]]>
+	</update>
+	
+	<!-- 메모 삭제 -->
+	<delete id="deleteMemo" parameterType="map">
+		<![CDATA[
+			DELETE
+			FROM		memo
+			WHERE		user_place_idx = #{userPlaceIdx}
+		]]>
+	</delete>
+	
+	<!-- 명소 삭제 -->
+	<delete id="deleteUserPlace" parameterType="map">
+		<![CDATA[
+			DELETE
+			FROM		user_place
+			WHERE		user_place_idx = #{userPlaceIdx}
+		]]>
+	</delete>
+	
+	<!-- 플래너에 저장된 일차별 명소 순서 바꾸기 -->
+	<update id="updateDayIdxByOldDayIdx" parameterType="map">
+		<![CDATA[
+			UPDATE		user_place
+			SET			day_idx = #{newDayIdx}
+			WHERE		day_idx = #{oldDayIdx}
+		]]>
+	</update>
+	
+	<!-- 플래너에 저장된 일차별 안에 명소 순서 바꾸기 -->
+	<update id="updateUserPlaceDayIdx" parameterType="com.wayble.dto.UserPlaceDto">
+		<![CDATA[
+			UPDATE		user_place
+			SET			save_idx = #{saveIdx}
+			WHERE		user_place_idx = #{userPlaceIdx}
+		]]>
+	</update>
+	
+	
+	<!-- 플래너 기본정보 불러오기 -->
+	<select id="loadPlanner" resultType="com.wayble.dto.PlannerDto">
+		<![CDATA[ 
+			SELECT		planner_idx plannerIdx, user_idx userIdx, city_idx cityIdx, title, 
+						start_date startDate, end_date endDate, complete_yn completeYn
+			FROM 		planner
+			ORDER BY 	plannerIdx DESC
+		]]>
+	</select>
+	
+	<!-- 플래너 시작 -->
+	<insert id="startPlanner" parameterType="com.wayble.dto.PlannerDto">
+		<selectKey keyProperty="plannerIdx" resultType="int" order="BEFORE">
+			<![CDATA[
+				SELECT 	seq_planner_idx.nextval FROM dual
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO	planner (planner_idx, user_idx, city_idx, title, start_date, end_date, complete_yn)
+			VALUES		(#{plannerIdx}, #{userIdx}, #{cityIdx}, (SELECT country || ' ' || name || ' ' || '여행' FROM city WHERE city_idx = #{cityIdx}), #{startDate}, #{endDate}, 'N')
+		]]>
+	</insert>
+	
+	<!-- 플래너 정보 가져오기 -->
+	<select id="getPlannerInfo" resultType="com.wayble.dto.PlannerInfoDto">
+		<![CDATA[
+			SELECT		c.country, c.name city, p.title, p.start_date startDate, p.end_date endDate
+			FROM 		planner p
+			INNER JOIN	city c ON c.city_idx = p.city_idx
+			WHERE		planner_idx = #{plannerIdx}
+		]]>
+	</select>
+	
+	<!-- 여행 일차 만큼 dayIdx 만들기 -->
+	<insert id="generateDayIdx" parameterType="com.wayble.dto.DayDto">
+		<selectKey keyProperty="dayIdx" resultType="int" order="BEFORE">
+			<![CDATA[
+				SELECT 	seq_day_idx.nextval FROM dual
+			]]>
+		</selectKey>
+		<![CDATA[
+			INSERT INTO	day (day_idx, planner_idx)
+			VALUES		(#{dayIdx}, #{plannerIdx})
+		]]>		
+	</insert>
+	
+	<!-- 플래너 리뷰 -->
+	<select id="plannerReview" resultType="com.wayble.dto.PlannerDto">	
+		<![CDATA[
+			SELECT		planner_idx plannerIdx, user_idx userIdx, city_idx cityIdx, title, 
+						start_date startDate, end_date endDate, complete_YN completeYN
+			FROM		planner
+			WHERE		complete_YN = 'Y'
+			ORDER BY	plannerIdx desc
+		]]>
+	</select>
+	
+	<!-- 마이페이지 달력 -->
+	<select id="getMyPageCalendar" resultType="com.wayble.dto.PlannerDto">
+		<![CDATA[
+			SELECT 		plannerIdx, userIdx, cityIdx, title, startDate, endDate
+			FROM 		(
+			    		SELECT planner_idx AS plannerIdx, 
+			    		user_idx AS userIdx, 
+			    		city_idx AS cityIdx, title,
+			    		start_date AS startDate, 
+			    		end_date AS endDate,
+			    		TO_CHAR(start_date, 'YYYY/MM/DD') startDateStr, 
+			    		TO_CHAR(end_date, 'YYYY/MM/DD') endDateStr
+			    		FROM planner
+						)
+			WHERE 		TO_CHAR(startDate, 'YYYYMM') <= #{plannerDate}
+						AND TO_CHAR(endDate, 'YYYYMM') >= #{plannerDate}
+						AND plannerIdx IN (
+							SELECT planner_idx FROM partner WHERE user_idx = #{userIdx}
+							UNION
+							SELECT planner_idx FROM planner WHERE user_idx = #{userIdx}
+						)
+		]]>
+	</select>
+	
+	<!-- 현재 진행 중인 플래너  -->
+	<select id="currentPlanner" resultType="com.wayble.dto.PlannerDto">
+		<![CDATA[
+			SELECT 		planner_idx plannerIdx, city_idx cityIdx, title, start_date startDate, 
+						end_date endDate ,user_idx userIdx,complete_YN completeYN
+			FROM 		planner 
+			WHERE 		end_date >=sysdate AND user_idx = #{userIdx}
+		]]>
+	</select>
+	
+	<!-- 지난 플래너 -->
+	<select id="pastPlanner" resultType="com.wayble.dto.PlannerDto">
+		<![CDATA[
+			SELECT 		planner_idx plannerIdx, city_idx cityIdx, title, start_date startDate, 
+						end_date endDate ,user_idx userIdx,complete_YN completeYN
+			FROM 		planner 
+			WHERE 		end_date <=sysdate AND user_idx = #{userIdx}
+			ORDER BY 	end_date DESC
+		]]>
+	</select>
+	
+	<!-- 플래너리뷰의 리뷰내용들 가져오기 -->
+   	<select id="reviewList" resultType="com.wayble.dto.ReviewDetailDto">
+     	<![CDATA[
+            SELECT 
+                r.user_idx AS userIdx, 
+                r.planner_idx AS plannerIdx, 
+                r.review_idx reviewIdx, 
+                u.profile, 
+                u.nickname, 
+                r.rate, 
+                r.content
+ 			FROM review r
+         	INNER JOIN users u ON r.user_idx = u.user_idx
+         	WHERE planner_idx = #{plannerIdx}
+        ]]>
+    </select>
+   
+    <!-- 플래너리뷰에 댓글쓰기 (미구현. 현재에러) -->
+    <insert id="reviewComment">
+        <![CDATA[
+      		INSERT INTO 	REVIEW(review_idx, planner_idx, user_idx, rate, content) 
+      		VALUES			(seq_review_idx.nextval, #{plannerIdx}, #{userIdx}, #{rate}, #{content})
+      	]]>
+   	</insert>
+	</mapper>

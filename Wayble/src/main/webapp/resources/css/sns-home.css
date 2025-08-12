@@ -1,0 +1,328 @@
+	@charset "UTF-8";
+	* { box-sizing: border-box; }
+	.border { border: 1px solid red; }
+	.center { margin: 0 auto; }
+	@font-face {font-family: 'netmarbleB'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.1/netmarbleB.woff') format('woff'); font-weight: normal; font-style: normal; }
+	#bg-screen {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: rgba(0,0,0,0.3);
+		z-index: 5;
+		display: none;
+	}
+	body {
+	    width: 1920px;
+    	height: 1080px;
+	}
+	.to-home {
+    	position: absolute;
+	    top: 20px;
+	    left: 295px;
+	    opacity: 0;
+	    width: 170px;
+	    height: 50px;
+	}
+	
+	#header {
+		height: 75px;
+		color: rgb(32, 123, 250);
+		font-size: 40px;
+		margin: 0px 250px 15px;
+		padding: 10px 40px;
+		font-family: 'netmarbleB';
+	    border-bottom: 2px solid #c0c0c0;
+	}
+	
+	
+	#notice {
+		margin: 0px 250px;
+		height: 40px;
+		object-fit: cover;
+		display: flex;
+		justify-content: flex-end;
+		position: realtive;
+	}
+	 #notice > * {
+		width: 30px;
+		height: 30px;
+		margin: 5px 5px;
+	}
+	.chat-list-popup { 
+		left: 300px;
+	}
+	
+	
+	#middle {
+		height: 700px;
+		margin: 0px 250px;
+		display: flex;
+	}
+	#middle > div:nth-child(1) {
+	   	width: 850px;
+  		height: 750px;
+  		overflow-x: hidden;
+  		overflow-y: scroll;
+  		border-right: 2px solid #c0c0c0;
+	}
+	
+	
+	.post {
+		width: 850px;
+		height: 700px;
+		padding: 0px 50px;
+	}
+	.post > div:nth-child(1) {
+		position: relative;
+		margin-bottom: 10px;
+	}
+	.post > div:nth-child(1) > img {
+		width: 40px;
+		height: 40px;
+		object-fit: cover;
+		border-radius: 50%;
+	}
+	.post > div:nth-child(1) > span {
+		font-size: 20px;
+		position: absolute;
+		left: 50px;
+		bottom: 10px;
+	}
+	.image-list {
+		width: 750px;
+		height: 450px;
+	}
+	.image-list > div {
+		width: 740px; 
+		height: 450px; 
+		display: flex; 
+		justify-content: center;
+	}
+	.image-list > div > img {
+		max-height: 100%;
+ 		object-fit: cover;
+		margin-right: 10px;
+	}
+	.post > div:nth-child(3) {
+		display: flex;
+	}
+	.post > div:nth-child(3) > span {
+		margin: 20px;
+	}
+	.post > div:nth-child(4) {
+		height: 40px;
+		display: flex;  
+    	align-items: center;
+	}
+	.post > div:nth-child(4) > label {
+		margin-right: 5px;
+	}
+	.post > div:nth-child(4) > label:nth-child(1) > img {
+	    width: 30px;
+    	height: 30px;
+	}
+	.checked {
+		display: none;
+	}
+    input[type="checkbox"]:checked ~ .unchecked {
+		display: none;
+	}
+	input[type="checkbox"]:checked ~ .checked {
+		display: inline;
+	}
+	.post > div:nth-child(4) > button {
+	    width: 30px;          
+	    height: 30px;
+        justify-content: center;
+    	display: flex;
+    	align-items: center;
+   	 	margin: 0 5px 7px 10px;
+	}
+	.post > div:nth-child(4) > button > img {
+		width: 35px;
+		height: 35px;
+		margin: 0px 5px;
+		object-fit: cover;
+	}
+	.post > div:nth-child(5) {
+		display: flex;
+		width: 750px;
+		height: 40px;
+		border-radius: 10px;
+		border: 2px solid #8080805e;
+		padding: 10px;
+	}
+	.post > div:nth-child(5) > input[type='text'] {
+		border: none;
+		background-color: white;
+	    width: 700px;
+    	outline: none;
+	}
+	
+	#right {
+		width: 550px;
+		height: 700px;
+		padding: 0px 40px;
+	}
+	#right > div:nth-child(1) {
+		width: 140px;
+		height: 40px;
+		margin: 20px;
+		padding: 5px 10px;
+		position: relative;
+	}
+	#right > div:nth-child(1) > input {
+		width: 30px;
+		height: 30px;
+		margin-right: 10px;
+		object-fit: cover;
+	}
+	#right > div:nth-child(1) > span {
+		position: absolute;
+		top: 13px;
+	}
+	#right > div:nth-child(2) {
+		width: 310px;
+		height: 150px;
+		border-radius: 20px;
+		padding: 10px;
+		border: 2px solid #8080805e;
+	}
+	#right > div:nth-child(2) > div:nth-child(1) {
+		height: 70px;
+		position: relative;
+	}
+	#right > div:nth-child(2) > div:nth-child(1) > img {
+		width: 55px;
+		height: 55px;
+		border-radius: 50%;
+	    margin: 5px 0 0 10px;
+	}
+	#to-my-page {
+		position: absolute;
+		top: 20px;
+		font-size: 23px;
+		left: 70px;
+		border: none;
+		background-color: white;
+	}
+	
+	
+	#follow {
+		height: 70px;
+		display: flex;
+	}
+	#follow > * {
+		margin: 0px 15px;
+		width: 70px;
+		height: 60px;
+		position: relative;
+		padding: 5px;
+	}
+	#follow > * > h3 {
+		margin-bottom: 5px;
+	}
+	#follow > * > span {
+		position: absolute;
+		transform: translate(-50%, -50%);
+		left: 50%;
+		top: 70%;
+	}
+	
+	
+	#right > div:nth-child(3) {
+		margin-top: 30px;
+		margin-left: 25px;
+		height: 40px;
+		position: relative;
+		margin-bottom: 20px;
+	}
+	#right > div:nth-child(3) > input[type='text'] {
+		width: 380px;
+		height: 40px;
+		border-radius: 30px;
+		border: 1px solid #8080805e;
+		padding-left: 10px;
+	}
+	#right > div:nth-child(3) > input:nth-child(2) {
+		position: absolute;
+		width: 35px;
+		height: 35px;
+		right: 25px;
+		object-fit: cover;
+	}
+	.make-open-chat-popup {
+		border: none;
+		background-color: white;
+	}
+	.make-open-chat-popup > img {
+		width: 30px;
+		height: 30px;
+		position: absolute;
+		right: -5px;
+		top: 3px;
+		object-fit: cover;
+	}
+	#right > div:nth-child(4) {
+		width: 420px;
+		height: 430px;
+		margin-left: 25px;
+		overflow-x: hidden;
+		overflow-y: scroll;
+	}
+	
+	.chat-room {
+		width: 390px;
+		height: 75px;
+		padding: 10px;
+		border-radius: 10px;
+		margin: 0 0 10px 15px;
+		border: none;
+		position: relative;
+	}
+	.chat-room > div:nth-child(1) {
+		font-size: 16px;
+		display: flex;
+		height: 35px;
+	}
+	.chat-room > div:nth-child(1) > div:nth-child(1) {
+		width: 25px;
+		height: 25px;
+		border-radius: 10px;
+		margin-top: 3px;
+	}
+	.chat-room > div:nth-child(1) > div:nth-child(2) {
+		justify-content: center;
+		align-content: center;
+		margin-left: 5px;
+	}
+	.chat-room > div:nth-child(2) {
+		display: flex;
+		font-size: 15px;
+		margin-left: 4px;
+	}
+	.chat-room > div:nth-child(3) {
+	    text-align: center;
+	    font-size: 18px;
+	    position: absolute;
+	    top: 10px;
+	    right: 20px;
+	    width: 25px;
+	    height: 25px;
+	}
+	.notice-message {
+	    border-radius: 30px;
+	    height: 40px;
+	    background-color: #9e9e9e26;
+	    text-align: center;
+	    margin: 10px 25px;
+	    width: 480px;
+	    text-align: center;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    color: #222020a8;
+	}
+	

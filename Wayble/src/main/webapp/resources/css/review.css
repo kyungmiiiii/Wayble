@@ -1,0 +1,464 @@
+@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 100;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Thin.otf) format('opentype');}
+		@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 300;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Light.otf) format('opentype');}
+		@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 400;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Regular.otf) format('opentype');}
+		@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 500;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Medium.otf) format('opentype');}
+		@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 700;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Bold.otf) format('opentype');}
+		@font-face {font-family: 'Noto Sans KR';font-style: normal;font-weight: 900;src: url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.woff2) format('woff2'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.woff) format('woff'),url(//fonts.gstatic.com/ea/notosanskr/v2/NotoSansKR-Black.otf) format('opentype');}
+		
+		@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.6/dist/web/static/pretendard.css");
+		body {
+			font-family: 'Pretendard', 'AppleSDGothicNeo', 'AppleSDGothicNeo-Regular', 'Apple Gothic', 'Malgun Gothic', Arial, Helvetica, serif, sans-serif;
+			margin: 0;
+		}
+		.border { border: 1px solid red; }
+		* { box-sizing: border-box; }
+		
+		#map {
+		    width: 100%;
+		    height: 100%;
+		    position: absolute;
+		    overflow: hidden;
+		}
+		#review_div {
+			width: 1420px;	
+			margin: 30px auto;
+		}
+		#review_div > div:nth-child(1) > span:nth-child(1) { /* 4.4 */
+			font-size: 48px;
+			color: #111;
+			font-weight: 600;
+			margin-top: 5px;
+		}
+		#review_div > div:nth-child(1) > span:nth-child(2) {	/* /5 */
+			font-size: 26px;
+			color: #dbdbdb;
+			line-height :76px;
+			margin-top: 5px;
+		}
+		#review_div > div:nth-child(1) {
+			display:flex;
+			width: 280px;
+			margin: 0 auto;
+		}
+		#review_div > div:nth-child(2) > div:nth-child(2) {
+			position: relative;
+		}
+		.outer_star {
+			display: block;
+			content: '☆';
+			height: 32px;
+		    background: url(https://image.hanatour.com/usr/static/svg/rating_star_off.svg) repeat-x 0 0 / 32px;
+		    width: 160px;
+		    margin-top: 22px;
+		    margin-left: 20px;
+		}
+		.inner_star {
+			background: url(https://image.hanatour.com/usr/static/svg/rating_star_on.svg) repeat-x 0 0 / 32px;
+		    display: block;
+		    height: 100%;
+		    width: 89%;
+		}
+		.star {
+			appearance: none;
+		}
+		.star::after {
+			content: url("https://image.hanatour.com/usr/static/svg/rating_star_off.svg");
+			display: inline-block;
+			transform: scale(3.5); /* 2배 확대 */
+			transform-origin: top left;
+		}
+		.star:checked::after,
+		.star:has(~ .star:checked)::after {
+		  	content: url(https://image.hanatour.com/usr/static/svg/rating_star_on.svg);
+		}
+		.star:NOT(.clicked):hover::after,
+		.star:NOT(.clicked):has(~ .star:hover)::after {
+		  	content: url(https://image.hanatour.com/usr/static/svg/rating_star_on.svg);
+		}
+		.star:checked::after,
+		.star:has(~ .star:checked)::after {
+		  	content: url(https://image.hanatour.com/usr/static/svg/rating_star_on.svg);
+		}
+		.user_outer_star {
+			display: block;
+		    height: 120px;
+		    width: 130px;
+		    margin: 0 auto;
+		    background: url(https://image.hanatour.com/usr/static/svg/rating_star_off.svg) repeat-x 0 0 / 128px;
+		}
+		.user_inner_star {
+			background: url(https://image.hanatour.com/usr/static/svg/rating_star_on.svg) repeat-x 0 0 / 128px;
+		    display: block;
+		    height: 100%;
+		    width: 0%;
+		}
+		#review_div > div:nth-child(2) {
+			display: flex;
+			justify-content: space-between;
+			font-size: 14px;
+		    font-weight: 400;
+		    color: #333;
+		    letter-spacing: -0.4px;
+		    margin-bottom: 20px;
+		    padding-left: 37px;
+    		padding-right: 10px;
+		}
+		#review_div > div:nth-child(2) > div:nth-child(2) > span:nth-child(2){
+			margin-left: 10px;
+		}
+		
+		.article {
+			width: 1420px;
+		    margin: 0 auto;
+		    padding-left: 37px;
+		    padding-right: 0px;
+		}
+		
+		.article_header {
+			display: flex;
+			align-items: center;
+		}
+		.article_header > img:nth-child(1) {	/* 프로필이미지 */
+			width : 16px;
+		}
+		.article_header > span:nth-child(2) {	/* 점수 */
+			color: #5e2bb8;
+    		font-size: 16px;
+    		font-weight: 600;
+    		margin-right:32px;
+		}
+		.article_header > img:nth-child(3){	/* 별이미지 */
+			border: 1px solid #ddd;
+		    width: 20px;
+		    height: 20px;
+		    margin-right: 5px;
+		    border-radius: 10px;
+		}
+		.article_header > span:nth-child(4) {	/* 작성자아이디 */
+			color: #666;
+		    font-size: 13px;
+		}
+		.article_content{
+			font-size: 15px;
+		    color: #111;
+		    letter-spacing: -.6px;
+		    line-height: 26px;
+		}
+		
+		#map_schedule_div {
+			display:flex;
+			padding-right: 250px;
+			padding-left: 250px;
+		}
+		#map_schedule_div > div:nth-child(1) {
+			width: 375px;
+			height: 100%;
+		}
+		
+		#map_schedule_div > div:nth-child(2) {
+			position: relative;
+			width: calc(100% - 375px);
+			height: 710px;
+    		margin-top: 10px;
+		}
+		#map_schedule_div #float_div {
+			position: absolute;
+			bottom: 10px;
+			left: 10px;
+			right: 10px;
+			height: 200px;
+			background-color: white;
+			box-shadow: rgba(0, 0, 0, 0.07) 0px 0px 20px 0px;
+			border-radius: 6px;
+			border: none;
+		}
+		
+		#float_div > div:nth-child(1) > ul {
+			list-style-type: none;
+			display:flex;
+			gap:10px;
+		}
+		#float_div > div:nth-child(1) li {
+			width: 60px;
+			height: 34px;
+			color: white;
+			background:rgb(54,143,255);
+			border: 1px solid rgb(54,143,255);
+			padding: 8px 14px;
+			border-radius: 100px;
+			font-size: 13px;
+			font-weight: bold;
+			line-height: 16px;
+			color: rgba(58,58,58,0.3);
+			background: white;
+			border: 1px solid rgb(58,58,58,0.3);
+		}
+		
+		#float_div > div:nth-child(1) li.active {
+			color: white;
+			background:rgb(54,143,255);
+			border: 1px solid rgb(54,143,255);
+		}
+		#float_div > div:nth-child(2) {
+			display: flex;
+			padding-left: 40px;
+		}
+		
+		#float_div > div:nth-child(2) img {
+			width: 72px;
+			height: 88px;
+			border-radius: 6px;
+			object-fit: cover;
+		}
+		
+		#float_div > div:nth-child(2) > div:nth-child(2) {
+			margin-left: 12px;
+		}
+		
+		#float_div > div:nth-child(2) > div:nth-child(2) > h3 {	/* 명소이름 */
+			color : rgb(58,58,58);
+			font-weight: bold;
+			font-size: 16px;
+			line-height: 1.2;
+			letter-spacing: 0px;
+			margin-top: 25px;
+			margin-bottom: 3px;
+		}
+		
+		#float_div > div:nth-child(2) > div:nth-child(2) > div:nth-child(2) {	/* 명소별점 */
+			display: flex;
+			color: rgba(58, 58, 58, 0.4);
+			font-size: 13px;
+			line-height: 1.2;
+			font-weight: 500;
+    		letter-spacing: 0px;
+		}
+		#float_div > div:nth-child(2) > div:nth-child(2) > div:nth-child(3) > span:nth-child(6) {
+			margin-left: 5px;
+		}
+		
+		.small_star_yellow, .small_star_grey {
+			display: block;
+			width: 14px;
+			height: 14px;
+			background-size: 14px 14px;
+		}
+		
+		.big_star_yellow, .big_star_grey {
+			display: block;
+			width: 30px;
+			height: 30px;
+			background-size: 30px 30px;
+		}
+		
+		.small_star_yellow, .big_star_yellow {
+			background-image: url("https://assets.triple.guide/images/img-review-star-full@4x.png");
+		}
+		.small_star_grey, .big_star_grey{
+			background-image: url("https://assets.triple.guide/images/img-review-star-empty@4x.png");
+		}
+		#map_schedule_div > div:nth-child(1) {
+			max-height: 900px;
+			overflow-y: auto;
+			padding: 8px 16px;
+		}
+		#map_schedule_div > div:nth-child(1) > h6 {	/* 플래너 제목 : ex.오사카 여행 */
+			color: rgba(58, 58, 58, 0.7);
+			font-weight: bold;
+			font-size: 13px;
+		    line-height: 18px;
+		    letter-spacing: 0px;
+		    margin: 4px 0;
+		}
+		#map_schedule_div > div:nth-child(1) > h1 {	/* 플래너 설명 : ex.현지인 맛집으로 블라블라 */
+			color: rgb(58, 58, 58);
+			font-weight: bold;
+    		margin-top: 8px;
+    		font-size: 24px;
+    		line-height: 1.2;
+    		letter-spacing: 0px;
+		}
+		
+		#map_schedule_div > div:nth-child(1) >  div {	/* day선택 : ex. day1  */
+			position: sticky;
+			margin-top: 2px;
+    		top: 0px;
+    		font-weight: 500;
+    		color: rgb(58, 58, 58);
+    		font-size: 14px;
+		    line-height: 1.2;
+		    letter-spacing: 0px;
+		}
+		#map_schedule_div > div:nth-child(1) > div > img { /* 'v' */
+			display: block;
+			margin-top: 2px;
+		}
+		
+		.timeline {
+		
+		}
+		.timeline::after {
+			content: "";
+		    width: 2px;
+		    height: calc(100% + 14px);
+		    background-color: rgb(245, 245, 245);
+		    position: absolute;
+		    top: -6px;
+		    left: 23px;
+		    z-index: -1;
+		}
+		
+		.timeline_outer {
+			padding: 6px 20px 6px 24px;
+		}
+		
+		.timeline_inner {
+			position: relative;
+			display: flex;
+			gap: 21px;
+		}
+		.timeline_inner > div:nth-child(1) {
+			width: 20px;
+			color:white;
+		}
+		
+		.timeline_inner > div:nth-child(2) {	/* 도톤보리 일대 맛집 */
+			width: 275px;
+			border-radius: 6px;
+    		padding: 16px 15px;
+    		background-color: rgb(255, 255, 255);
+    		box-shadow: rgba(0, 0, 0, 0.07) 0px 0px 20px 0px;
+		}
+		
+		.timeline_inner > div:nth-child(2) > h3 {	/* 도톤보리 */
+			font-weight: 600;
+			margin-bottom: 3px;
+			margin-top: 0px;
+			color: rgb(58,58,58);
+			font-size: 16px;
+			line-height: 1.2;
+			letter-spacing: 0px;
+		}
+		
+		.timeline_inner > div:nth-child(2) > h6 { /* 관광명소.난바 */
+			color: rgba(58, 58, 58, 0.4);
+			font-weight: 500;
+		    font-size: 13px;
+		    line-height: 1.2;
+		    letter-spacing: 0px;
+		    margin: 0;
+		}
+		.timeline_inner > div:nth-child(1) {	/* left */
+			display: flex;
+			align-items: center;
+		}
+		.timeline .numbered {
+			transform: translate(-50%, -30%);
+			width: 20px;
+		    height: 20px;
+		    border-radius: 50%;
+		    text-align: center;
+		    color: var(--color-white);
+		    font-size: 11px;
+		    font-weight: 600;
+		    line-height: 20px;
+		}
+		.timeline .small_circle_blue {
+			transform: translate(-50%, -50%);
+			background-color: rgb(41, 135, 240);
+			border-radius: 50%;
+			width: 8px;
+			height: 8px;
+		}
+		.timeline .circle_violet {
+		    background-color: rgb(151, 95, 255);
+		}
+		.timeline .circle_orange {
+		    background-color: rgb(255, 97, 104);
+		}
+		.timeline .distance {
+			position: absolute;
+		    border: 1px solid lightgrey;
+		    background-color: white;
+		    color: black;
+		    width: 55px;
+		    margin-left: -25px;
+		    margin-top: 70px;
+		    line-height: 20px;
+		    border-radius: 7px;
+		    text-align: center;
+		    font-size: 11px;
+		    font-weight: 400;
+		    width: 50px;
+		    height: 25px;
+		    line-height: 25px;
+		}
+		#comment_star {
+			display: flex;
+			justify-content: center;
+			width: 1350px;
+			height: 130px;
+			padding-left:250px;
+			padding-right:250px;
+			margin: 0 auto;
+		}
+		#comment_star > input {
+			height: 120px;
+		    width: 130px;
+		    cursor: pointer;
+		}
+		#comment {
+			width: 1350px;
+			height: 150px;
+			padding-left:250px;
+			padding-right:250px;
+			margin: 0 auto;
+		}
+		#comment > div:nth-child(1) > textarea {
+			position: absolute;
+		    transform: translate(-17%, 10%);
+		    width: 1279px;
+		    height: 130px;
+		    padding:20px;
+		    font-size: 15px;
+		    font-family: 'Noto Sans KR';
+		}
+		#comment > div:nth-child(1) > textarea::placeholder {
+			color: rgb(213, 215, 259);
+			font-size: 14px;
+			font-family: 'Noto Sans KR';
+		}
+		#regist {
+			display:flex;
+			justify-content: center;
+			padding: 30px 250px 0px 250px;
+		}
+		
+		#regist > input {
+			width: 270px;
+		    height: 45px;
+		    border-radius: 10px;
+		    font-family: 'Noto Sans KR';
+		    font-size: 25px;
+		    font-weight: 600;
+			background-color: #3089FF;
+			border: none;
+		}
+		.click_map_schedule_div {	/* 부모div에 relative걸어주고, 크기/위치 등 퍼센트로 조절하면됨! */
+		    position: absolute;
+		    opacity: 0;
+		    width: 86%;
+		    height: 100%;
+		    bottom: 0;
+		    cursor: pointer;
+		    right: 0;
+		}
+		.click_array {
+			position: absolute;
+		    opacity: 0;
+		    width: 55%;
+		    height: 100%;
+		    bottom: 0;
+		    cursor: pointer;
+		    right: 0;
+		}
